@@ -12,7 +12,6 @@ enum class ValueType {
   _NULL,
 };
 struct Value {
-
   template <typename T> T get() {
     T result = std::any_cast<T>(value);
     return result;
