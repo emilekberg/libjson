@@ -2,7 +2,9 @@
 #include <libjson/parse.h>
 
 TEST(Parser, parses_object_one_key) {
-  libjson::JSONObject result = libjson::parse(R"({"key":"value"})");
+  libjson::JSONValue val = libjson::parse(R"({"key":"value"})");
+
+  libjson::JSONObject result = val.get<libjson::JSONObject>();
   ASSERT_TRUE(result.has("key"));
 
   libjson::JSONValue value = result.get("key");
@@ -13,7 +15,9 @@ TEST(Parser, parses_object_one_key) {
 }
 
 TEST(Parser, parses_object_two_keys) {
-  libjson::JSONObject result = libjson::parse(R"({"a":"first","b":"second"})");
+  libjson::JSONValue val = libjson::parse(R"({"a":"first","b":"second"})");
+
+  libjson::JSONObject result = val.get<libjson::JSONObject>();
   ASSERT_TRUE(result.has("a"));
   ASSERT_TRUE(result.has("b"));
 
@@ -30,8 +34,10 @@ TEST(Parser, parses_object_two_keys) {
 }
 
 TEST(Parser, parses_object_with_object) {
-  libjson::JSONObject result =
+  libjson::JSONValue val =
       libjson::parse(R"({"root":{"branch":"deep value"}})");
+
+  libjson::JSONObject result = val.get<libjson::JSONObject>();
   ASSERT_TRUE(result.has("root"));
 
   libjson::JSONValue rootValue = result.get("root");

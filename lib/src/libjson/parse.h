@@ -12,7 +12,7 @@ struct Tokenizer {
   size_t pos{};
 };
 
-JSONObject parse(const std::string &input);
+JSONValue parse(const std::string &input);
 JSONObject parseObject(Tokenizer &tokens);
 JSONValue parseValue(const Token &token, Tokenizer &tokens);
 JSONValue parseNumber(const Token &token);

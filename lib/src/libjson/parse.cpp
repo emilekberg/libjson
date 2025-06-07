@@ -8,24 +8,11 @@
 #include <stdexcept>
 #include <vector>
 namespace libjson {
-JSONObject parse(const std::string &input) {
+JSONValue parse(const std::string &input) {
   Tokenizer tokens = tokenize(input);
   JSONObject result;
   Token t = tokens.next();
-  switch (t.type) {
-  case TokenTypes::SEPARATOR: {
-    if (t.literal == "{") {
-      return parseObject(tokens);
-    } else if (t.literal == "[") {
-      throw std::runtime_error("not implemented");
-    }
-  } break;
-  case TokenTypes::ILLEGAL:
-  case TokenTypes::END_OF_FILE:
-  default:
-    return result;
-  }
-  return result;
+  return parseValue(t, tokens);
 }
 
 JSONObject parseObject(Tokenizer &tokens) {
@@ -34,22 +21,18 @@ JSONObject parseObject(Tokenizer &tokens) {
     Token tKey = tokens.next();
     assert(tKey.type == TokenTypes::STRING);
     Token tColon = tokens.next();
-    assert(tColon.type == TokenTypes::SEPARATOR);
-    assert(tColon.literal == ":");
+    assert(tColon == Token_Colon);
 
     Token tValue = tokens.next();
     JSONValue value = parseValue(tValue, tokens);
     result.add(tKey.literal, value);
 
     Token tEnd = tokens.next();
-    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "}") {
+    if (tEnd == Token_CloseBracket) {
       return result;
     }
-
-    assert(tEnd.type == TokenTypes::SEPARATOR);
-    assert(tEnd.literal == ",");
+    assert(tEnd == Token_Comma);
   }
-
   return result;
 }
 
@@ -63,11 +46,10 @@ JSONArray parseArray(Tokenizer &tokens) {
     result.data.push_back(value);
 
     Token tEnd = tokens.next();
-    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "]") {
+    if (tEnd == Token_CloseArray) {
       return result;
     }
-    assert(tEnd.type == TokenTypes::SEPARATOR);
-    assert(tEnd.literal == ",");
+    assert(tEnd == Token_Comma);
   }
 
   return result;
@@ -104,9 +86,9 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
     return parseLiteral(token);
   } break;
   case TokenTypes::SEPARATOR: {
-    if (token.literal == "{") {
+    if (token == Token_OpenBracket) {
       return {JSONValueType::OBJECT, parseObject(tokens)};
-    } else if (token.literal == "[") {
+    } else if (token == Token_OpenArray) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
     }
   } break;
