@@ -8,29 +8,32 @@
 #include <vector>
 namespace libjson {
 Object parse(const std::string &input) {
-  std::vector<Token> tokens = tokenize(input);
-  size_t counter = 0;
-  auto next = [&]() { return tokens[counter++]; };
+  Tokenizer tokens = tokenize(input);
   Object result;
-  Token t = next();
+  Token t = tokens.next();
   assert(t.type == TokenTypes::SEPARATOR && t.literal == "{");
-  t = next();
+
+  t = tokens.next();
   assert(t.type == TokenTypes::STRING);
   std::string key = t.literal;
-  t = next();
+
+  t = tokens.next();
   assert(t.type == TokenTypes::SEPARATOR && t.literal == ":");
-  t = next();
+
+  t = tokens.next();
   assert(t.type == TokenTypes::STRING);
   std::any value = t.literal;
   result.add(key, {ValueType::STRING, value});
-  t = next();
+
+  t = tokens.next();
   assert(t.type == TokenTypes::SEPARATOR && t.literal == "}");
-  t = next();
+
+  t = tokens.next();
   assert(t.type == TokenTypes::END_OF_FILE);
 
   return result;
 }
-std::vector<Token> tokenize(const std::string &input) {
+Tokenizer tokenize(const std::string &input) {
   std::vector<Token> tokens;
   Lexer lexer(input);
   Token token;
@@ -44,6 +47,6 @@ std::vector<Token> tokenize(const std::string &input) {
       break;
     }
   }
-  return tokens;
+  return {tokens};
 }
 } // namespace libjson
