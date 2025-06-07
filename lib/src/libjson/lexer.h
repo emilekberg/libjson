@@ -20,6 +20,7 @@ public:
   bool isLiteral();
   bool isEscaped();
   bool isDigit();
+  bool isEndOfFile();
 
 private:
   std::string _input;
