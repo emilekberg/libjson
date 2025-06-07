@@ -1,5 +1,7 @@
 # libjson
 
+[![CMake Build & Test](https://github.com/emilekberg/libjson/actions/workflows/cmake-build.yml/badge.svg)](https://github.com/emilekberg/libjson/actions/workflows/cmake-build.yml)
+
 This is probably not a :fire: blazing fast parser. But I made it. With :hearts:
 
 ## Features
@@ -24,3 +26,4 @@ if (result.has("key"))
 ```
 
 https://www.json.org/json-en.html
+

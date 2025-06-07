@@ -3,9 +3,6 @@ project(json)
 set(CMAKE_CXX STANDARDS 23)
 set(CMAKE_EXPORT_COMPILE_OPTIONS ON)
 
-
-
-
 add_subdirectory(lib)
 add_subdirectory(playground)
 
