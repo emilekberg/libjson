@@ -1,5 +1,6 @@
 #pragma once
-#include "object.h"
+#include "json-array.h"
+#include "json-object.h"
 #include "token.h"
 #include <string>
 #include <vector>
@@ -11,9 +12,11 @@ struct Tokenizer {
   size_t pos{};
 };
 
-Object parse(const std::string &input);
-Object parseObject(const Tokenizer &tokens);
-std::vector<Value> parseArray(const Tokenizer &tokens);
-Value parseValue(const Tokenizer &tokens);
+JSONObject parse(const std::string &input);
+JSONObject parseObject(Tokenizer &tokens);
+JSONValue parseValue(const Token &token, Tokenizer &tokens);
+JSONValue parseNumber(const Token &token);
+JSONValue parseLiteral(const Token &token);
+JSONArray parseArray(Tokenizer &tokens);
 Tokenizer tokenize(const std::string &input);
 } // namespace libjson

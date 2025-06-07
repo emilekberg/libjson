@@ -1,38 +1,124 @@
 #include "parse.h"
-#include "libjson/lexer.h"
-#include "libjson/object.h"
-#include "libjson/token_types.h"
+#include "lexer.h"
+#include "libjson/json-array.h"
+#include "libjson/json-value.h"
 #include "token.h"
+#include "token_types.h"
 #include <cassert>
 #include <stdexcept>
 #include <vector>
 namespace libjson {
-Object parse(const std::string &input) {
+JSONObject parse(const std::string &input) {
   Tokenizer tokens = tokenize(input);
-  Object result;
+  JSONObject result;
   Token t = tokens.next();
-  assert(t.type == TokenTypes::SEPARATOR && t.literal == "{");
+  switch (t.type) {
+  case TokenTypes::SEPARATOR: {
+    if (t.literal == "{") {
+      return parseObject(tokens);
+    } else if (t.literal == "[") {
+      throw std::runtime_error("not implemented");
+    }
+  } break;
+  case TokenTypes::ILLEGAL:
+  case TokenTypes::END_OF_FILE:
+  default:
+    return result;
+  }
+  return result;
+}
 
-  t = tokens.next();
-  assert(t.type == TokenTypes::STRING);
-  std::string key = t.literal;
+JSONObject parseObject(Tokenizer &tokens) {
+  JSONObject result;
+  while (true) {
+    Token tKey = tokens.next();
+    assert(tKey.type == TokenTypes::STRING);
+    Token tColon = tokens.next();
+    assert(tColon.type == TokenTypes::SEPARATOR);
+    assert(tColon.literal == ":");
 
-  t = tokens.next();
-  assert(t.type == TokenTypes::SEPARATOR && t.literal == ":");
+    Token tValue = tokens.next();
+    JSONValue value = parseValue(tValue, tokens);
+    result.add(tKey.literal, value);
 
-  t = tokens.next();
-  assert(t.type == TokenTypes::STRING);
-  std::any value = t.literal;
-  result.add(key, {ValueType::STRING, value});
+    Token tEnd = tokens.next();
+    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "}") {
+      return result;
+    }
 
-  t = tokens.next();
-  assert(t.type == TokenTypes::SEPARATOR && t.literal == "}");
-
-  t = tokens.next();
-  assert(t.type == TokenTypes::END_OF_FILE);
+    assert(tEnd.type == TokenTypes::SEPARATOR);
+    assert(tEnd.literal == ",");
+  }
 
   return result;
 }
+
+JSONArray parseArray(Tokenizer &tokens) {
+  JSONArray result;
+
+  while (true) {
+    Token token = tokens.next();
+    JSONValue value = parseValue(token, tokens);
+
+    result.data.push_back(value);
+
+    Token tEnd = tokens.next();
+    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "}") {
+      return result;
+    }
+    assert(tEnd.type == TokenTypes::SEPARATOR);
+    assert(tEnd.literal == ",");
+  }
+
+  return result;
+}
+
+JSONValue parseNumber(const Token &token) {
+  double d = std::stod(token.literal);
+  return {JSONValueType::NUMBER, d};
+}
+
+JSONValue parseLiteral(const Token &token) {
+  switch (token.literal[0]) {
+  case 't':
+    return {JSONValueType::BOOL, true};
+  case 'f':
+    return {JSONValueType::BOOL, false};
+    break;
+  case 'n':
+    return {JSONValueType::_NULL, nullptr};
+    break;
+  }
+  throw std::runtime_error("should never come here");
+}
+
+JSONValue parseValue(const Token &token, Tokenizer &tokens) {
+  switch (token.type) {
+  case TokenTypes::STRING: {
+    return {JSONValueType::STRING, token.literal};
+  } break;
+  case TokenTypes::NUMBER: {
+    return parseNumber(token);
+  } break;
+  case TokenTypes::LITERAL: {
+    return parseLiteral(token);
+  } break;
+  case TokenTypes::SEPARATOR: {
+    if (token.literal == "{") {
+      return {JSONValueType::OBJECT, parseObject(tokens)};
+    } else if (token.literal == "[") {
+      return {JSONValueType::ARRAY, parseArray(tokens)};
+    }
+  } break;
+  case TokenTypes::ILLEGAL:
+  case TokenTypes::END_OF_FILE:
+  default:
+    throw std::runtime_error("ParseJSONObject: Reached unnexpected token");
+    break;
+  }
+  throw std::runtime_error("ParseJSONObject: Reached unnexpected token");
+}
+
 Tokenizer tokenize(const std::string &input) {
   std::vector<Token> tokens;
   Lexer lexer(input);

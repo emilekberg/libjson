@@ -13,8 +13,8 @@ set(gtest_force_shared_crt
 
 FetchContent_MakeAvailable(googletest)
 
-file(GLOB_RECURSE LIBJSON_TEST_SUBDIRS CONFIGURE_DEPENDS "cases/**/*_test.cpp")
-file(GLOB_RECURSE LIBJSON_TEST_ROOT CONFIGURE_DEPENDS "cases/*_test.cpp")
+file(GLOB_RECURSE LIBJSON_TEST_SUBDIRS CONFIGURE_DEPENDS "cases/**/*.test.cpp")
+file(GLOB_RECURSE LIBJSON_TEST_ROOT CONFIGURE_DEPENDS "cases/*.test.cpp")
 
 add_executable(libjson_test ${LIBJSON_TEST_SUBDIRS} ${LIBJSON_TEST_ROOT})
 
