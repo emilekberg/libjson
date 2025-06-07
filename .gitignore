@@ -26,3 +26,4 @@ CMakeUserPresets.json
 build
 out
 .cache
+compile_commands.json
