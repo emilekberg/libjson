@@ -93,12 +93,12 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
     }
   } break;
   case TokenTypes::ILLEGAL:
+    throw std::runtime_error("ParseJSONObject: Reached illegal token");
   case TokenTypes::END_OF_FILE:
-  default:
-    throw std::runtime_error("ParseJSONObject: Reached unnexpected token");
-    break;
+    throw std::runtime_error(
+        "ParseJSONObject: Reached EOF token when not expecting to.");
   }
-  throw std::runtime_error("ParseJSONObject: Reached unnexpected token");
+  throw std::runtime_error("ParseJSONObject: Should never reach here.");
 }
 
 Tokenizer tokenize(const std::string &input) {
