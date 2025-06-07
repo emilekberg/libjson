@@ -1,7 +1,7 @@
 #include "parse.h"
+#include "json-array.h"
+#include "json-value.h"
 #include "lexer.h"
-#include "libjson/json-array.h"
-#include "libjson/json-value.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
@@ -63,7 +63,7 @@ JSONArray parseArray(Tokenizer &tokens) {
     result.data.push_back(value);
 
     Token tEnd = tokens.next();
-    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "}") {
+    if (tEnd.type == TokenTypes::SEPARATOR && tEnd.literal == "]") {
       return result;
     }
     assert(tEnd.type == TokenTypes::SEPARATOR);

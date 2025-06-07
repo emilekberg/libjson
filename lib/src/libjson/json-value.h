@@ -1,5 +1,6 @@
 #pragma once
 #include <any>
+#include <string>
 namespace libjson {
 enum class JSONValueType {
   STRING,
@@ -18,5 +19,6 @@ struct JSONValue {
 
   JSONValueType type;
   std::any value;
+  std::string literal = "";
 };
 } // namespace libjson

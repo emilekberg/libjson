@@ -1,0 +1,21 @@
+#include "libjson/json-array.h"
+#include <gtest/gtest.h>
+#include <libjson/parse.h>
+#include <vector>
+
+TEST(parse, array_of_numbers) {
+  std::vector<double> expected_arr = {1, 2, 4, 8, 16, 32, 64};
+  libjson::Tokenizer tokens = libjson::tokenize(R"([1,2,4,8,16,32,64])");
+  // we know first token is an array, so discard it.
+  tokens.next();
+  libjson::JSONArray array = libjson::parseArray(tokens);
+
+  ASSERT_EQ(array.data.size(), 7);
+
+  for (size_t i = 0; i < array.data.size(); i++) {
+    double expected = expected_arr[i];
+    double actual = array.data[i].get<double>();
+
+    EXPECT_EQ(actual, expected);
+  }
+}
