@@ -1,5 +1,6 @@
 #include "json-object.h"
-#include <cassert>
+#include <sstream>
+#include <stdexcept>
 
 namespace libjson {
 void JSONObject::add(const std::string &key, JSONValue value) {
@@ -10,14 +11,14 @@ bool JSONObject::has(const std::string &key) {
   const auto &value = data.find(key);
   return value != data.end();
 }
-JSONValue &JSONObject::get(const std::string &key) {
-  assert(has(key));
-  const auto &value = data.find(key);
+JSONValue &JSONObject::getValue(const std::string &key2) {
+  if (!has(key2)) {
+    std::ostringstream oss;
+    oss << "invalid argument 'key': value = " << key2;
+    throw std::invalid_argument(oss.str());
+  }
+  const auto &value = data.find(key2);
   return value->second;
 }
 
-template <typename T> T JSONObject::get(const std::string &key) {
-  JSONValue &value = get(key);
-  return value.get<T>();
-}
 } // namespace libjson

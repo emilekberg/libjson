@@ -7,7 +7,7 @@ TEST(Parser, parses_object_one_key) {
   libjson::JSONObject result = val.get<libjson::JSONObject>();
   ASSERT_TRUE(result.has("key"));
 
-  libjson::JSONValue value = result.get("key");
+  libjson::JSONValue value = result.getValue("key");
   EXPECT_EQ(value.type, libjson::JSONValueType::STRING);
   EXPECT_EQ(std::any_cast<std::string>(value.value), "value");
   EXPECT_EQ(value.get<std::string>(), "value");
@@ -21,16 +21,16 @@ TEST(Parser, parses_object_two_keys) {
   ASSERT_TRUE(result.has("a"));
   ASSERT_TRUE(result.has("b"));
 
-  libjson::JSONValue valueA = result.get("a");
+  libjson::JSONValue valueA = result.getValue("a");
   EXPECT_EQ(valueA.type, libjson::JSONValueType::STRING);
   EXPECT_EQ(std::any_cast<std::string>(valueA.value), "first");
   EXPECT_EQ(valueA.get<std::string>(), "first");
 
-  libjson::JSONValue valueB = result.get("b");
+  libjson::JSONValue valueB = result.getValue("b");
   EXPECT_EQ(valueB.type, libjson::JSONValueType::STRING);
   EXPECT_EQ(std::any_cast<std::string>(valueB.value), "second");
   EXPECT_EQ(valueB.get<std::string>(), "second");
-  // EXPECT_EQ(result.get<std::string>("key"), "value");
+  EXPECT_EQ(result.get<std::string>("b"), "second");
 }
 
 TEST(Parser, parses_object_with_object) {
@@ -40,11 +40,12 @@ TEST(Parser, parses_object_with_object) {
   libjson::JSONObject result = val.get<libjson::JSONObject>();
   ASSERT_TRUE(result.has("root"));
 
-  libjson::JSONValue rootValue = result.get("root");
+  libjson::JSONValue rootValue = result.getValue("root");
   auto root = rootValue.get<libjson::JSONObject>();
   ASSERT_TRUE(root.has("branch"));
 
-  libjson::JSONValue branchValue = root.get("branch");
+  libjson::JSONValue branchValue = root.getValue("branch");
+  std::string branchstr = branchValue.get<std::string>();
   EXPECT_EQ(branchValue.type, libjson::JSONValueType::STRING);
-  EXPECT_EQ(branchValue.get<std::string>(), "deep value");
+  EXPECT_EQ(branchstr, "deep value");
 }
