@@ -19,6 +19,5 @@ struct JSONValue {
 
   JSONValueType type;
   std::any value;
-  std::string literal = "";
 };
 } // namespace libjson
