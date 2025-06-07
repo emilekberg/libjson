@@ -4,7 +4,7 @@ This is probably not a :fire: blazing fast parser. But I made it. With :hearts:
 
 ## Example
 
-```
+```cpp
 libjson::JSONObject result = libjson::parse(R"({"key":"value"})");
 if (result.has("key"))
 {
