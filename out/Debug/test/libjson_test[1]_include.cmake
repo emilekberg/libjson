@@ -1,5 +1,0 @@
-if(EXISTS "/home/emilekberg/dev/json/out/Debug/test/libjson_test[1]_tests.cmake")
-  include("/home/emilekberg/dev/json/out/Debug/test/libjson_test[1]_tests.cmake")
-else()
-  add_test(libjson_test_NOT_BUILT libjson_test_NOT_BUILT)
-endif()
