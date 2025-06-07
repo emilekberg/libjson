@@ -1,0 +1,44 @@
+[
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -I/home/emilekberg/dev/json/lib/src -g -o lib/CMakeFiles/libjson.dir/src/libjson/parser.cpp.o -c /home/emilekberg/dev/json/lib/src/libjson/parser.cpp",
+  "file": "/home/emilekberg/dev/json/lib/src/libjson/parser.cpp",
+  "output": "lib/CMakeFiles/libjson.dir/src/libjson/parser.cpp.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -I/home/emilekberg/dev/json/lib/src -g -o playground/CMakeFiles/playground.dir/src/main.cpp.o -c /home/emilekberg/dev/json/playground/src/main.cpp",
+  "file": "/home/emilekberg/dev/json/playground/src/main.cpp",
+  "output": "playground/CMakeFiles/playground.dir/src/main.cpp.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -I/home/emilekberg/dev/json/lib/src -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/include -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest -g -o test/CMakeFiles/libjson_test.dir/cases/some_test.cpp.o -c /home/emilekberg/dev/json/test/cases/some_test.cpp",
+  "file": "/home/emilekberg/dev/json/test/cases/some_test.cpp",
+  "output": "test/CMakeFiles/libjson_test.dir/cases/some_test.cpp.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -I/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/include -I/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/include -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest -g -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o -c /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "file": "/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/src/gmock-all.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/include -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/include -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest -g -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o -c /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "file": "/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googlemock/src/gmock_main.cc",
+  "output": "_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -I/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/include -I/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest -g -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o -c /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "file": "/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/src/gtest-all.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o"
+},
+{
+  "directory": "/home/emilekberg/dev/json/out/Debug",
+  "command": "/usr/bin/c++ -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/include -isystem /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest -g -Wall -Wshadow -Wundef -Wno-error=dangling-else -DGTEST_HAS_PTHREAD=1 -fexceptions -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -o _deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o -c /home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "file": "/home/emilekberg/dev/json/out/Debug/_deps/googletest-src/googletest/src/gtest_main.cc",
+  "output": "_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o"
+}
+]

@@ -1,0 +1,26 @@
+# ninja log v5
+0	3	0	/home/emilekberg/dev/json/out/Debug/CMakeFiles/cmake.verify_globs	4528a1599d9dd21d
+3	12	1749276743375185290	lib/CMakeFiles/libjson.dir/src/libjson/parser.cpp.o	af74daa0df827497
+3	12	1749276743375185290	test/CMakeFiles/libjson_test.dir/cases/some_test.cpp.o	b278643f9fd86f17
+4	581	1749276743946155528	_deps/googletest-build/googletest/CMakeFiles/gtest_main.dir/src/gtest_main.cc.o	15421a14b7f4baa6
+4	727	1749276744091028574	_deps/googletest-build/googlemock/CMakeFiles/gmock_main.dir/src/gmock_main.cc.o	e691b2028e75da9a
+4	1232	1749276744593823261	_deps/googletest-build/googlemock/CMakeFiles/gmock.dir/src/gmock-all.cc.o	b2a7e1466546e711
+4	2458	1749276745817715225	_deps/googletest-build/googletest/CMakeFiles/gtest.dir/src/gtest-all.cc.o	9d13e393ec82e76f
+1	4	0	/home/emilekberg/dev/json/out/Debug/CMakeFiles/cmake.verify_globs	4528a1599d9dd21d
+5	13	1749276785587702720	playground/CMakeFiles/playground.dir/src/main.cpp.o	e74f7dda334e6de2
+4	117	1749276785690240503	lib/liblibjson.a	c10a40ebbf73d888
+5	140	1749276785711602543	lib/libgtest.a	e21429778cf18d0f
+141	160	1749276785732964580	lib/libgtest_main.a	30ececf4ed42069a
+140	167	1749276785741509396	lib/libgmock.a	aed9b9110c6e7301
+167	186	1749276785758599027	lib/libgmock_main.a	685aef476c43eaae
+117	206	1749276785779961064	playground/playground	10aecf22c9e11c2f
+160	243	1749276785814140327	test/libjson_test	b2a9ceed990a3552
+160	243	1749276785814140327	test/libjson_test[1]_tests.cmake	b2a9ceed990a3552
+160	243	1749276785814140327	/home/emilekberg/dev/json/out/Debug/test/libjson_test[1]_tests.cmake	b2a9ceed990a3552
+2	8	0	/home/emilekberg/dev/json/out/Debug/CMakeFiles/cmake.verify_globs	4528a1599d9dd21d
+8	620	1749276794569194670	test/CMakeFiles/libjson_test.dir/cases/some_test.cpp.o	b278643f9fd86f17
+620	812	1749276794761311695	test/libjson_test	b2a9ceed990a3552
+620	812	1749276794761311695	test/libjson_test[1]_tests.cmake	b2a9ceed990a3552
+620	812	1749276794761311695	/home/emilekberg/dev/json/out/Debug/test/libjson_test[1]_tests.cmake	b2a9ceed990a3552
+1	3	0	/home/emilekberg/dev/json/out/Debug/CMakeFiles/cmake.verify_globs	4528a1599d9dd21d
+0	3	0	/home/emilekberg/dev/json/out/Debug/CMakeFiles/cmake.verify_globs	4528a1599d9dd21d
