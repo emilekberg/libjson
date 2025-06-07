@@ -11,13 +11,13 @@ bool JSONObject::has(const std::string &key) {
   const auto &value = data.find(key);
   return value != data.end();
 }
-JSONValue &JSONObject::getValue(const std::string &key2) {
-  if (!has(key2)) {
+JSONValue &JSONObject::getValue(const std::string &key) {
+  if (!has(key)) {
     std::ostringstream oss;
-    oss << "invalid argument 'key': value = " << key2;
+    oss << "invalid argument 'key': value = " << key;
     throw std::invalid_argument(oss.str());
   }
-  const auto &value = data.find(key2);
+  const auto &value = data.find(key);
   return value->second;
 }
 
