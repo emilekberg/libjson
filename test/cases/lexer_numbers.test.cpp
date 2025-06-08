@@ -1,11 +1,6 @@
 #include <gtest/gtest.h>
 #include <libjson/lexer.h>
 
-TEST(Lexer, isNumber) {
-  libjson::Lexer lexer("\0");
-  EXPECT_FALSE(lexer.isNumber());
-}
-
 TEST(Lexer, number) {
   libjson::Lexer lexer(R"(1337)");
   libjson::Token t = lexer.next();

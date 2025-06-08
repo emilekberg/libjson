@@ -40,12 +40,13 @@ JSONObject parseObject(Tokenizer &tokens) {
   while (true) {
     Token tKey = tokens.next();
     if (tKey.type != TokenTypes::STRING) {
-      throw std::invalid_argument("expected string but got something else");
+      throw std::invalid_argument(
+          std::format("expected {}, but got {}", "string", tKey.literal));
     }
     Token tColon = tokens.next();
     if (tColon != Token_Colon) {
       throw std::invalid_argument(std::format(
-          "expected {}, but got {}", Token_Colon.literal, tKey.literal));
+          "expected {}, but got {}", Token_Colon.literal, tColon.literal));
     }
 
     Token tValue = tokens.next();

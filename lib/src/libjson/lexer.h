@@ -8,23 +8,19 @@ public:
   Lexer(const std::string_view &input);
   Token next();
 
-  void nextChar();
-  char current();
-  char peekNext();
-  char peekPrev();
-
-  bool isWhitespace();
-  bool isSeparator();
-  bool isString();
-  bool isNumber();
-  bool isLiteral();
-  bool isEscaped();
-  bool isEscaped(size_t offset);
-  bool isDigit();
-  bool isNumberExponentComponent();
-  bool isEndOfFile();
-
 private:
+  inline void nextChar();
+  inline char current() const;
+
+  inline bool isWhitespace() const;
+  inline bool isSeparator() const;
+  inline bool isString() const;
+  inline bool isNumber() const;
+  inline bool isLiteral() const;
+  inline bool isDigit() const;
+  inline bool isNumberExponentComponent() const;
+  inline bool isEndOfFile() const;
+
   std::string_view _input;
   size_t _position;
   size_t _nextPosition;

@@ -10,26 +10,31 @@ It uses `std::string_view` internally so make sure your string outlives the pars
 
 It evaluates numbers from strings when you requrest it so take note of that. This is tradeoff for sake of supporting more arithmetic types.
 
+## How to 
+
+### Build
+
+```bash
+# debug
+cmake -S . -B build/Debug -G Ninja
+cmake --build build/Debug
+
+# release
+cmake -DCMAKE_BUILD_TYPE=Release -S . -B build/Release -G Ninja
+cmake --build build/Release
+```
+
+### Run Benchmark
+
+build `release` like above, then
+```bash
+./build/Debug/benchmark/libjson_bench
+```
+
 ## Todo
 
-- Add https://github.com/briandfoy/json-acceptance-tests/tree/master
-
-
-
-## Benchmark
-
-```
--------------------------------------------------------------------------
-Benchmark                               Time             CPU   Iterations
--------------------------------------------------------------------------
-MB_Parse_LargeJson             1896738562 ns   1898130165 ns            1
-BM_ParseMtCars(32 rows)            102167 ns       102184 ns         6748
-BM_ParseIris(150 rows)             206290 ns       206262 ns         3404
-BM_ParseTitanic(891 rows)         2756810 ns      2755621 ns          255
-BM_ParseHousePrice(1 460 rows)    1737837 ns      1736682 ns          403
-BM_ParseWeather(2 922 rows)       1951446 ns      1949777 ns          358
-```
-
+- [/] https://github.com/briandfoy/json-acceptance-tests/tree/master
+  - supports most, some which i've intentionally left out for now.
 
 ## Features
 

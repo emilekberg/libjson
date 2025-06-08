@@ -18,14 +18,8 @@ void Lexer::nextChar() {
   }
   _char = _input[_position];
 }
-char Lexer::current() { return _char; }
-char Lexer::peekNext() { return _input[_nextPosition]; }
-char Lexer::peekPrev() {
-  if (_position == 0) {
-    return false;
-  }
-  return _input[_position - 1];
-}
+char Lexer::current() const { return _char; }
+
 Token Lexer::next() {
   while (isWhitespace()) {
     nextChar();
@@ -134,7 +128,7 @@ Token Lexer::next() {
       expected_literal = "null";
     }
     size_t end = _position;
-    for (char c : expected_literal) {
+    for (const char &c : expected_literal) {
       if (current() != c) {
         end = _position;
         return {TokenTypes::ILLEGAL, _input.substr(start, end - start)};
@@ -150,7 +144,7 @@ Token Lexer::next() {
   return {TokenTypes::ILLEGAL, _input.substr(start, count)};
 }
 
-bool Lexer::isWhitespace() {
+bool Lexer::isWhitespace() const {
   if (_char == ' ') {
     return true;
   }
@@ -167,21 +161,21 @@ bool Lexer::isWhitespace() {
 }
 // TODO: this is not corrent
 // should be able to use only the size to figure this out, not the current...
-bool Lexer::isEndOfFile() {
+bool Lexer::isEndOfFile() const {
   return _position >= _input.size() || current() == '\0';
 }
-bool Lexer::isNumber() { return isDigit() || _char == '-'; }
-bool Lexer::isNumberExponentComponent() { return _char == 'e' || _char == 'E'; }
-bool Lexer::isString() { return _char == '"'; }
-bool Lexer::isLiteral() { return _char == 'f' || _char == 't' || _char == 'n'; }
-bool Lexer::isSeparator() {
+bool Lexer::isNumber() const { return isDigit() || _char == '-'; }
+bool Lexer::isNumberExponentComponent() const {
+  return _char == 'e' || _char == 'E';
+}
+bool Lexer::isString() const { return _char == '"'; }
+bool Lexer::isLiteral() const {
+  return _char == 'f' || _char == 't' || _char == 'n';
+}
+bool Lexer::isSeparator() const {
   return _char == '{' || _char == '}' || _char == '[' || _char == ']' ||
          _char == ':' || _char == ',';
 }
-bool Lexer::isEscaped() { return peekPrev() == '\\'; }
-bool Lexer::isEscaped(size_t offset) {
-  return _input[_position + offset] == '\\';
-}
-bool Lexer::isDigit() { return (_char >= '0' && _char <= '9'); }
+bool Lexer::isDigit() const { return (_char >= '0' && _char <= '9'); }
 
 } // namespace libjson

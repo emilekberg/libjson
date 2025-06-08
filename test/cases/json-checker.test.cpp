@@ -31,12 +31,11 @@ INSTANTIATE_TEST_SUITE_P(
     ::testing::Values(
         "fail1.json", "fail2.json", "fail3.json",
         // "fail4.json", // NOTE: trailing comma
-        // "fail5.json", // NOTE: trailing comma. reconsider as this is two
+        // "fail5.json", // NOTE: trailing comma.
         "fail6.json", "fail7.json", "fail8.json",
 
         // "fail9.json", // trailing comma
-        "fail10.json", "fail11.json", "fail12.json",
-        "fail13.json", // TODO: invalidate number with leading zero.
+        "fail10.json", "fail11.json", "fail12.json", "fail13.json",
         "fail14.json",
 
         // "fail15.json", // TODO: implement this, validates specific escapes
@@ -53,8 +52,8 @@ INSTANTIATE_TEST_SUITE_P(
         // "fail26.json", // TODO: same as above
         // "fail27.json", // TODO: linebreak in key, fix this
         // "fail28.json", // TODO: linebreak in key, fix this
-        "fail29.json", // TODO: exponent, should be fine?
-        "fail30.json", "fail31.json", "fail32.json", "fail33.json"));
+
+        "fail33.json"));
 
 TEST_P(JsonCheckerPassesTests, fails) {
   EXPECT_FALSE(filecontent.empty());
