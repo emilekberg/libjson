@@ -1,3 +1,4 @@
+#include "libjson/json-object.h"
 #include <fstream>
 #include <iostream>
 #include <libjson/parse.h>
@@ -11,9 +12,12 @@ static std::string loadFile(const std::string &path) {
 }
 
 int main() {
-  // std::string json = loadFile("data/large-file.json");
-  std::string input = R"("an \"escaped\" strings")";
-  auto result = libjson::parse(input);
-
+  std::string json = loadFile("data/large-file.json");
+  //   std::string json = R"({
+  //     "public": true,
+  //     "created_at": "2015-01-01T15:00:00Z",
+  // })";
+  auto result = libjson::parse(json);
+  // auto val = result.get<libjson::JSONObject>();
   return 0;
 }

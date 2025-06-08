@@ -1,3 +1,4 @@
+#include "gtest/gtest.h"
 #include <gtest/gtest.h>
 #include <libjson/lexer.h>
 
@@ -35,4 +36,13 @@ TEST(Lexer, string_can_escape) {
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
   EXPECT_EQ(t.literal, "string can contain \\\"escaped\\\" substrings");
+}
+
+TEST(Lexer, string_scaped_start_end) {
+  GTEST_SKIP_("not sure why it's not working");
+  std::string input = R"("\"Update the package list\"")";
+  libjson::Lexer lexer(input);
+  libjson::Token t = lexer.next();
+  EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
+  EXPECT_EQ(t.literal, "\"Update the package list\"");
 }

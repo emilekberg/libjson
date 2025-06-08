@@ -67,3 +67,43 @@ TEST(Lexer, string_escape_edgecase) {
     EXPECT_EQ(actual.literal, expected.literal);
   }
 }
+
+TEST(Lexer, literal_bools) {
+  std::string input = R"({
+    "public": true,
+    "created_at": "2015-01-01T15:00:00Z",
+})";
+
+  std::vector<libjson::Token> expected_tokens = {
+      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::STRING, "public"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::LITERAL, "true"},
+      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::STRING, "created_at"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
+      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::END_OF_FILE, "\0"}};
+
+  libjson::Lexer lexer(input);
+  std::vector<libjson::Token> actual_tokens;
+  while (true) {
+    libjson::Token t = lexer.next();
+    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
+    actual_tokens.push_back(t);
+    if (t.type == TokenTypes::END_OF_FILE) {
+      break;
+    }
+  }
+
+  EXPECT_EQ(actual_tokens.size(), expected_tokens.size());
+  for (size_t i = 0; i < actual_tokens.size(); i++) {
+    const auto &actual = actual_tokens[i];
+    const auto &expected = expected_tokens[i];
+
+    EXPECT_EQ(actual.type, expected.type);
+    EXPECT_EQ(actual.literal, expected.literal);
+  }
+}

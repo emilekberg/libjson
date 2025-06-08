@@ -7,7 +7,8 @@ namespace libjson {
 
 struct Token {
   bool operator==(const Token &other) const {
-    return type == other.type && literal == other.literal;
+    return type == other.type &&
+           std::string(literal) == std::string(other.literal);
   }
 
   TokenTypes type;

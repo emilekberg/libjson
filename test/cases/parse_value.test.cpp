@@ -1,3 +1,4 @@
+#include "libjson/json-object.h"
 #include "libjson/json-value.h"
 #include <gtest/gtest.h>
 #include <libjson/parse.h>
@@ -50,4 +51,30 @@ TEST(parse, value_literal_null) {
 
   EXPECT_EQ(value.type, libjson::JSONValueType::_NULL);
   // EXPECT_EQ(value.get<int>(), nullptr);
+}
+
+TEST(Parse, object_empty_object) {
+  std::string input = R"({})";
+
+  libjson::Tokenizer tokens = libjson::tokenize(input);
+  // we know first token is an array, so discard it.
+  tokens.next();
+  libjson::JSONValue value = libjson::parse(input);
+  ASSERT_EQ(value.type, libjson::JSONValueType::OBJECT);
+
+  libjson::JSONObject object = value.get<libjson::JSONObject>();
+  ASSERT_EQ(object.getKeys().size(), 0);
+}
+
+TEST(parse, array_empty_array) {
+  std::string input = R"([])";
+
+  libjson::Tokenizer tokens = libjson::tokenize(input);
+  // we know first token is an array, so discard it.
+  tokens.next();
+  libjson::JSONValue value = libjson::parse(input);
+  ASSERT_EQ(value.type, libjson::JSONValueType::ARRAY);
+
+  libjson::JSONArray array = value.get<libjson::JSONArray>();
+  ASSERT_EQ(array.size(), 0);
 }

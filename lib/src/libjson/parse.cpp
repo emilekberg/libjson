@@ -3,12 +3,11 @@
 #include "json-value.h"
 #include "lexer.h"
 #include "libjson/json-number.h"
+#include "libjson/json-object.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
 #include <format>
-#include <iostream>
-#include <ostream>
 #include <stdexcept>
 #include <string_view>
 #include <vector>
@@ -22,6 +21,10 @@ JSONValue parse(const std::string_view &input) {
 
 JSONObject parseObject(Tokenizer &tokens) {
   JSONObject result;
+  if (tokens.peek() == Token_CloseBracket) {
+    tokens.next();
+    return result;
+  }
   while (true) {
     Token tKey = tokens.next();
     assert(tKey.type == TokenTypes::STRING);
@@ -36,6 +39,16 @@ JSONObject parseObject(Tokenizer &tokens) {
     if (tEnd == Token_CloseBracket) {
       return result;
     }
+    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracket) {
+      // support trailing comma
+      // discard
+      tokens.next();
+      return result;
+    }
+    if (tEnd != Token_Comma) {
+      throw new std::invalid_argument(std::format(
+          "parseObject: Unexpected token {}", std::string(tEnd.literal)));
+    }
     assert(tEnd == Token_Comma);
   }
   return result;
@@ -43,6 +56,10 @@ JSONObject parseObject(Tokenizer &tokens) {
 
 JSONArray parseArray(Tokenizer &tokens) {
   JSONArray result;
+  if (tokens.peek() == Token_CloseArray) {
+    tokens.next();
+    return result;
+  }
 
   while (true) {
     Token token = tokens.next();
@@ -52,6 +69,12 @@ JSONArray parseArray(Tokenizer &tokens) {
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseArray) {
+      return result;
+    }
+    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracket) {
+      // support trailing comma
+      // discard
+      tokens.next();
       return result;
     }
     assert(tEnd == Token_Comma);
@@ -93,7 +116,8 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
     } else if (token == Token_OpenArray) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
     } else {
-      throw std::runtime_error("ParseJSONObject: Unexpected separator.");
+      throw std::runtime_error(std::format(
+          "ParseJSONObject: Unexpected separator: {}.", token.literal));
     }
   } break;
   case TokenTypes::ILLEGAL:
@@ -111,7 +135,7 @@ Tokenizer tokenize(const std::string_view &input) {
   Token token;
   while (true) {
     token = lexer.next();
-    std::cout << token.literal << std::endl;
+    // std::cout << token.literal << std::endl;
     if (token.type == TokenTypes::ILLEGAL) {
       throw std::runtime_error(std::format(
           "ILLEGAL TOKEN FOUND: {}, surrounding text", token.literal));

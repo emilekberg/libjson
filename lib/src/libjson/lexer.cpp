@@ -27,7 +27,6 @@ char Lexer::peekPrev() {
 }
 Token Lexer::next() {
   while (isWhitespace()) {
-
     nextChar();
   }
   if (isEndOfFile() || current() == '\0') {
@@ -42,18 +41,21 @@ Token Lexer::next() {
 
   else if (isString()) {
     // strings can be either ' or ", so we store it and search for it.
-    char search = _char;
+    char search = current();
     nextChar();
     size_t start = _position;
+
     // search for the closing quote matching the entry one.
     // if it's escaped, ignore it.
     while (!(current() == search)) {
-      nextChar();
       // if we stumble opon an escape sign, we do some skips.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
         nextChar();
         // this is the escaped sign, we skip this as well.
+        nextChar();
+      } else {
+        // otherwise we just skip one
         nextChar();
       }
     }
@@ -101,7 +103,6 @@ Token Lexer::next() {
       }
       nextChar();
     }
-    nextChar();
     end = start + expected_literal.size();
     return {TokenTypes::LITERAL, _input.substr(start, end - start)};
   }

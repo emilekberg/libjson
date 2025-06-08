@@ -8,6 +8,8 @@ namespace libjson {
 
 struct Tokenizer {
   Token &next() { return tokens[pos++]; }
+  // Token &current() { return tokens[pos]; }
+  Token &peek() { return tokens[pos]; }
   std::vector<Token> tokens;
   size_t pos{};
 };

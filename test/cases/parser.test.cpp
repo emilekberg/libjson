@@ -1,3 +1,6 @@
+#include "libjson/json-array.h"
+#include "libjson/json-object.h"
+#include "libjson/json-value.h"
 #include <gtest/gtest.h>
 #include <libjson/parse.h>
 
@@ -48,4 +51,46 @@ TEST(Parser, parses_object_with_object) {
   std::string branchstr = branchValue.get<std::string>();
   EXPECT_EQ(branchValue.type, libjson::JSONValueType::STRING);
   EXPECT_EQ(branchstr, "deep value");
+}
+
+TEST(Parser, parses_array_with_values) {
+  std::string input = R"([{"a":1},{"a":2},{"a":3}])";
+  std::vector<double> expected_arr = {1, 2, 3};
+  libjson::JSONValue value = libjson::parse(input);
+
+  ASSERT_EQ(value.type, libjson::JSONValueType::ARRAY);
+  libjson::JSONArray array = value.get<libjson::JSONArray>();
+  ASSERT_EQ(array.size(), expected_arr.size());
+
+  for (size_t i = 0; i < array.size(); i++) {
+    int expected = expected_arr[i];
+    int actual = array[i].get<libjson::JSONObject>().get<int>("a");
+    EXPECT_EQ(actual, expected);
+  }
+}
+
+TEST(Parser, objects_with_trailing_comma) {
+  std::string json = R"({
+    "id": "2489651045",
+    "actor": {
+        "id": 665991,
+    },
+    "repo": {
+        "id": 28688495,
+        "name": "petroav/6.828",
+        "url": "https://api.github.com/repos/petroav/6.828",
+    },
+    "payload": {
+        "ref": "master",
+        "ref_type": "branch",
+        "master_branch": "master",
+        "description":
+            "Solution to homework and assignments from MIT's 6.828 (Operating Systems Engineering). Done in my spare time.",
+        "pusher_type": "user",
+    },
+    "public": true,
+    "created_at": "2015-01-01T15:00:00Z",
+})";
+  libjson::JSONValue value = libjson::parse(json);
+  EXPECT_EQ(value.type, libjson::JSONValueType::OBJECT);
 }
