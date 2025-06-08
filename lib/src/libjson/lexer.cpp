@@ -41,14 +41,12 @@ Token Lexer::next() {
   }
 
   else if (isString()) {
-    // strings can be either ' or ", so we store it and search for it.
-    char search = current();
     nextChar();
     size_t start = _position;
 
     // search for the closing quote matching the entry one.
     // if it's escaped, ignore it.
-    while (!(current() == search)) {
+    while (!isString()) {
       // if we stumble opon an escape sign, we do some skips.
       // TODO: validate what we can skip. only certain characters can be
       // escaped according to the specification.
@@ -156,7 +154,7 @@ bool Lexer::isEndOfFile() {
 }
 bool Lexer::isNumber() { return isDigit() || _char == '-'; }
 bool Lexer::isNumberExponentComponent() { return _char == 'e' || _char == 'E'; }
-bool Lexer::isString() { return _char == '"' || _char == '\''; }
+bool Lexer::isString() { return _char == '"'; }
 bool Lexer::isLiteral() { return _char == 'f' || _char == 't' || _char == 'n'; }
 bool Lexer::isSeparator() {
   return _char == '{' || _char == '}' || _char == '[' || _char == ']' ||

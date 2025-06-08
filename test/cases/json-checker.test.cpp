@@ -49,12 +49,12 @@ INSTANTIATE_TEST_SUITE_P(
 
         "fail19.json", "fail20.json", "fail21.json", "fail22.json",
         "fail23.json",
-        // "fail24.json", // TODO: strings can only have single quotes?
+        "fail24.json", // TODO: strings can only have single quotes?
         // "fail25.json", // TODO: validate if this is illegal
         // "fail26.json", // TODO: same as above
         // "fail27.json", // TODO: linebreak in key, fix this
         // "fail28.json", // TODO: linebreak in key, fix this
-        // "fail29.json", // TODO: exponent, should be fine?
+        "fail29.json", // TODO: exponent, should be fine?
         "fail30.json", "fail31.json", "fail32.json", "fail33.json"));
 
 TEST_P(JsonCheckerPassesTests, fails) {
