@@ -2,7 +2,6 @@
 #include <charconv>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 
 namespace libjson {
 class JSONNumber {
