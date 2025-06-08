@@ -69,7 +69,7 @@ Token Lexer::next() {
 
   else if (isNumber()) {
     size_t start = _position;
-    int numberOfExponentSign = 0;
+    bool error = false;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       nextChar();
@@ -89,8 +89,9 @@ Token Lexer::next() {
         nextChar();
       }
       // validate that we have at least 1 digit after the exponent.
-      if (current() < '0' || current() > '9') {
-        numberOfExponentSign = 10;
+      if (!isDigit()) {
+        error = true;
+        // numberOfExponentSign = 10;
       }
       while (isDigit()) {
         nextChar();
@@ -100,7 +101,7 @@ Token Lexer::next() {
     size_t end = _position;
     std::string_view sub = _input.substr(start, end - start);
     // if we have a . here we have an issue mr president.
-    if (current() == '.' || numberOfExponentSign > 1) {
+    if (current() == '.' || error) {
       return {TokenTypes::ILLEGAL, sub};
     }
     return {TokenTypes::NUMBER, sub};
