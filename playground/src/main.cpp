@@ -1,13 +1,18 @@
-#include "libjson/token.h"
-#include "libjson/token_types.h"
+#include <fstream>
 #include <iostream>
-#include <libjson/lexer.h>
+#include <libjson/parse.h>
+#include <sstream>
+
+static std::string loadFile(const std::string &path) {
+  std::ifstream fstream(path);
+  std::ostringstream ss;
+  ss << fstream.rdbuf();
+  return ss.str();
+}
+
 int main() {
-  auto lexer = libjson::Lexer("{}");
-  libjson::Token t;
-  while ((t = lexer.next()).type != libjson::TokenTypes::ILLEGAL) {
-    std::cout << t.literal;
-  }
-  std::cout << "done!";
+  std::string json = loadFile("data/large-file.json");
+  auto result = libjson::parse(json);
+
   return 0;
 }

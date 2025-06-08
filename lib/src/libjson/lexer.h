@@ -1,11 +1,12 @@
 #pragma once
 #include "token.h"
 #include <string>
+#include <string_view>
 
 namespace libjson {
 class Lexer {
 public:
-  Lexer(std::string input);
+  Lexer(const std::string_view &input);
   Token next();
 
   void nextChar();
@@ -19,11 +20,12 @@ public:
   bool isNumber();
   bool isLiteral();
   bool isEscaped();
+  bool isEscaped(size_t offset);
   bool isDigit();
   bool isEndOfFile();
 
 private:
-  std::string _input;
+  std::string_view _input;
   size_t _position;
   size_t _nextPosition;
   char _char;

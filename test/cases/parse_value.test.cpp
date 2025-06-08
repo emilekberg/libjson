@@ -3,8 +3,8 @@
 #include <libjson/parse.h>
 
 TEST(parse, value_string) {
-  libjson::Tokenizer tokens = libjson::tokenize(R"("someString")");
-  // we know first token is an array, so discard it.
+  std::string input = R"("someString")";
+  libjson::Tokenizer tokens = libjson::tokenize(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -13,8 +13,8 @@ TEST(parse, value_string) {
 }
 
 TEST(parse, value_double) {
-  libjson::Tokenizer tokens = libjson::tokenize(R"(1234.56)");
-  // we know first token is an array, so discard it.
+  std::string input = R"(1234.56)";
+  libjson::Tokenizer tokens = libjson::tokenize(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -23,8 +23,8 @@ TEST(parse, value_double) {
 }
 
 TEST(parse, value_literal_true) {
-  libjson::Tokenizer tokens = libjson::tokenize(R"(true)");
-  // we know first token is an array, so discard it.
+  std::string input = R"(true)";
+  libjson::Tokenizer tokens = libjson::tokenize(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -33,8 +33,8 @@ TEST(parse, value_literal_true) {
 }
 
 TEST(parse, value_literal_false) {
-  libjson::Tokenizer tokens = libjson::tokenize(R"(false)");
-  // we know first token is an array, so discard it.
+  std::string input = R"(false)";
+  libjson::Tokenizer tokens = libjson::tokenize(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -43,8 +43,8 @@ TEST(parse, value_literal_false) {
 }
 
 TEST(parse, value_literal_null) {
-  libjson::Tokenizer tokens = libjson::tokenize(R"(null)");
-  // we know first token is an array, so discard it.
+  std::string input = R"(null)";
+  libjson::Tokenizer tokens = libjson::tokenize(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 

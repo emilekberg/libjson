@@ -1,6 +1,8 @@
+#include "libjson/token_types.h"
 #include <gtest/gtest.h>
 #include <libjson/lexer.h>
 
+using namespace libjson;
 TEST(Lexer, skips_leading_whitespace) {
   libjson::Lexer lexer(R"(       "ignored leading whitespace"      )");
   libjson::Token t = lexer.next();
@@ -26,4 +28,43 @@ TEST(Lexer, eof) {
 
   EXPECT_EQ(t.type, libjson::TokenTypes::END_OF_FILE);
   EXPECT_EQ(t.literal, "\0");
+}
+
+TEST(Lexer, string_escape_edgecase) {
+  std::string input(R"({
+  "message":"simpler non-flash version\\",
+  "distinct":true
+})");
+
+  std::vector<libjson::Token> expected_tokens = {
+      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::STRING, "message"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::STRING, "simpler non-flash version\\"},
+      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::STRING, "distinct"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::LITERAL, "true"},
+      {TokenTypes::SEPARATOR, "}"},
+  };
+  libjson::Lexer lexer(input);
+  libjson::Token t = lexer.next();
+  std::vector<libjson::Token> actual_tokens;
+  while (true) {
+    t = lexer.next();
+    if (t.type == TokenTypes::END_OF_FILE) {
+      break;
+    }
+    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
+    actual_tokens.push_back(t);
+  }
+
+  ASSERT_EQ(actual_tokens.size(), expected_tokens.size());
+  for (size_t i = 0; i < actual_tokens.size(); i++) {
+    const auto &actual = actual_tokens[i];
+    const auto &expected = expected_tokens[i];
+
+    EXPECT_EQ(actual.type, expected.type);
+    EXPECT_EQ(actual.literal, expected.literal);
+  }
 }

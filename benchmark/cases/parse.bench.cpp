@@ -19,12 +19,13 @@ void RegisterJsonBenchmark(const std::string &name, const std::string &path) {
   });
 }
 int main(int argc, char **argv) {
-  RegisterJsonBenchmark("BM_ParseMtCars(32 rows)", "data/mtcars.json");
-  RegisterJsonBenchmark("BM_ParseIris(150 rows)", "data/iris.json");
-  RegisterJsonBenchmark("BM_ParseTitanic(891 rows)", "data/titanic.json");
-  RegisterJsonBenchmark("BM_ParseHousePrice(1 460 rows)",
-                        "data/house-price.json");
-  RegisterJsonBenchmark("BM_ParseWeather(2 922 rows)", "data/weather.json");
+  RegisterJsonBenchmark("MB_Parse_LargeJson", "data/large-file.json");
+  // RegisterJsonBenchmark("BM_ParseMtCars(32 rows)", "data/mtcars.json");
+  // RegisterJsonBenchmark("BM_ParseIris(150 rows)", "data/iris.json");
+  // RegisterJsonBenchmark("BM_ParseTitanic(891 rows)", "data/titanic.json");
+  // RegisterJsonBenchmark("BM_ParseHousePrice(1 460 rows)",
+  //                       "data/house-price.json");
+  // RegisterJsonBenchmark("BM_ParseWeather(2 922 rows)", "data/weather.json");
 
   benchmark::Initialize(&argc, argv);
   benchmark::RunSpecifiedBenchmarks();

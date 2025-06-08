@@ -5,6 +5,7 @@
 #include <string>
 namespace libjson {
 enum class JSONValueType {
+  __ERROR__,
   STRING,
   NUMBER,
   OBJECT,

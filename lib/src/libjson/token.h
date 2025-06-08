@@ -1,6 +1,7 @@
 #pragma once
 #include "token_types.h"
 #include <string>
+#include <string_view>
 
 namespace libjson {
 
@@ -10,7 +11,7 @@ struct Token {
   }
 
   TokenTypes type;
-  std::string literal;
+  std::string_view literal;
 };
 
 static const Token Token_OpenBracket = {TokenTypes::SEPARATOR, "{"};

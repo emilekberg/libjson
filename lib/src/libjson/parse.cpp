@@ -6,10 +6,12 @@
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
+#include <format>
 #include <stdexcept>
+#include <string_view>
 #include <vector>
 namespace libjson {
-JSONValue parse(const std::string &input) {
+JSONValue parse(const std::string_view &input) {
   Tokenizer tokens = tokenize(input);
   JSONObject result;
   Token t = tokens.next();
@@ -26,7 +28,7 @@ JSONObject parseObject(Tokenizer &tokens) {
 
     Token tValue = tokens.next();
     JSONValue value = parseValue(tValue, tokens);
-    result.add(tKey.literal, value);
+    result.add(std::string(tKey.literal), value);
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracket) {
@@ -57,9 +59,7 @@ JSONArray parseArray(Tokenizer &tokens) {
 }
 
 JSONValue parseNumber(const Token &token) {
-  JSONNumber number(token.literal);
-  // double d = std::stod(token.literal);
-  return {JSONValueType::NUMBER, number};
+  return {JSONValueType::NUMBER, JSONNumber(std::string(token.literal))};
 }
 
 JSONValue parseLiteral(const Token &token) {
@@ -68,10 +68,8 @@ JSONValue parseLiteral(const Token &token) {
     return {JSONValueType::BOOL, true};
   case 'f':
     return {JSONValueType::BOOL, false};
-    break;
   case 'n':
     return {JSONValueType::_NULL, nullptr};
-    break;
   }
   throw std::runtime_error("should never come here");
 }
@@ -79,7 +77,7 @@ JSONValue parseLiteral(const Token &token) {
 JSONValue parseValue(const Token &token, Tokenizer &tokens) {
   switch (token.type) {
   case TokenTypes::STRING: {
-    return {JSONValueType::STRING, token.literal};
+    return {JSONValueType::STRING, std::string(token.literal)};
   } break;
   case TokenTypes::NUMBER: {
     return parseNumber(token);
@@ -92,6 +90,8 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
       return {JSONValueType::OBJECT, parseObject(tokens)};
     } else if (token == Token_OpenArray) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
+    } else {
+      throw std::runtime_error("ParseJSONObject: Unexpected separator.");
     }
   } break;
   case TokenTypes::ILLEGAL:
@@ -103,14 +103,15 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
   throw std::runtime_error("ParseJSONObject: Should never reach here.");
 }
 
-Tokenizer tokenize(const std::string &input) {
+Tokenizer tokenize(const std::string_view &input) {
   std::vector<Token> tokens;
   Lexer lexer(input);
   Token token;
   while (true) {
     token = lexer.next();
     if (token.type == TokenTypes::ILLEGAL) {
-      throw std::runtime_error("ILLEGAL TOKEN FOUND");
+      throw std::runtime_error(
+          std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
     }
     tokens.push_back(token);
     if (token.type == libjson::TokenTypes::END_OF_FILE) {

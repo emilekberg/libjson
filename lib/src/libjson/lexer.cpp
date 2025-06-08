@@ -2,7 +2,7 @@
 #include "libjson/token_types.h"
 
 namespace libjson {
-Lexer::Lexer(std::string input) : _input(input), _exit(false) {
+Lexer::Lexer(const std::string_view &input) : _input(input), _exit(false) {
   _position = 0;
   _nextPosition = 1;
   _char = _input[0];
@@ -27,6 +27,7 @@ char Lexer::peekPrev() {
 }
 Token Lexer::next() {
   while (isWhitespace()) {
+
     nextChar();
   }
   if (isEndOfFile() || current() == '\0') {
@@ -40,6 +41,7 @@ Token Lexer::next() {
   }
 
   else if (isString()) {
+    // strings can be either ' or ", so we store it and search for it.
     char search = _char;
     nextChar();
     size_t start = _position;
@@ -65,7 +67,7 @@ Token Lexer::next() {
       nextChar();
     }
     size_t end = _position;
-    std::string sub = _input.substr(start, end - start);
+    std::string_view sub = _input.substr(start, end - start);
     if (numberOfDots > 1) {
       return {TokenTypes::ILLEGAL, sub};
     }
@@ -95,7 +97,7 @@ Token Lexer::next() {
     return {TokenTypes::LITERAL, _input.substr(start, end - start)};
   }
 
-  return {TokenTypes::ILLEGAL, ""};
+  return {TokenTypes::ILLEGAL, _input.substr(_position - 10, 20)};
 }
 
 bool Lexer::isWhitespace() {
@@ -126,6 +128,9 @@ bool Lexer::isSeparator() {
          _char == ':' || _char == ',';
 }
 bool Lexer::isEscaped() { return peekPrev() == '\\'; }
+bool Lexer::isEscaped(size_t offset) {
+  return _input[_position + offset] == '\\';
+}
 bool Lexer::isDigit() { return (_char >= '0' && _char <= '9') || _char == '.'; }
 
 } // namespace libjson
