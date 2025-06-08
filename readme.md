@@ -10,10 +10,10 @@ This is probably not a :fire: blazing fast parser. But I made it. With :hearts:
 - Objects
 - Strings
 - Literals
-  - bool (true/false)
-  - null (sort of)
+  - bool, both true/false
+  - null
 - Numbers
-  - as long as it's decimal :) 
+  - Lazy evaluated, might not be the fastest, but takes less memory and supports all (i think) arithmeitc types. 
 
 ## Example
 
