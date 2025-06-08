@@ -1,0 +1,3 @@
+[submodule "json-acceptance-tests"]
+	path = json-acceptance-tests
+	url = https://github.com/briandfoy/json-acceptance-tests.git
