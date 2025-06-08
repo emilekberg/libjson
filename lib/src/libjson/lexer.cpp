@@ -75,6 +75,7 @@ Token Lexer::next() {
     if (current() == '-') {
       nextChar();
     }
+    // TODO: refactor it
     while (isDigit() || (current() == '.') || isNumberExponentComponent()) {
       // 1.53e+10 for instance
       if (isNumberExponentComponent()) {
