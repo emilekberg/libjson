@@ -11,8 +11,9 @@ static std::string loadFile(const std::string &path) {
 }
 
 int main() {
-  std::string json = loadFile("data/large-file.json");
-  auto result = libjson::parse(json);
+  // std::string json = loadFile("data/large-file.json");
+  std::string input = R"("an \"escaped\" strings")";
+  auto result = libjson::parse(input);
 
   return 0;
 }

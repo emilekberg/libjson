@@ -45,8 +45,17 @@ Token Lexer::next() {
     char search = _char;
     nextChar();
     size_t start = _position;
-    while (!(current() == search && !isEscaped())) {
+    // search for the closing quote matching the entry one.
+    // if it's escaped, ignore it.
+    while (!(current() == search)) {
       nextChar();
+      // if we stumble opon an escape sign, we do some skips.
+      if (current() == '\\') {
+        // since this is escape sign, we skip it.
+        nextChar();
+        // this is the escaped sign, we skip this as well.
+        nextChar();
+      }
     }
     size_t end = _position;
     nextChar();

@@ -40,26 +40,25 @@ TEST(Lexer, string_escape_edgecase) {
       {TokenTypes::SEPARATOR, "{"},
       {TokenTypes::STRING, "message"},
       {TokenTypes::SEPARATOR, ":"},
-      {TokenTypes::STRING, "simpler non-flash version\\"},
+      {TokenTypes::STRING, "simpler non-flash version\\\\"},
       {TokenTypes::SEPARATOR, ","},
       {TokenTypes::STRING, "distinct"},
       {TokenTypes::SEPARATOR, ":"},
       {TokenTypes::LITERAL, "true"},
       {TokenTypes::SEPARATOR, "}"},
-  };
+      {TokenTypes::END_OF_FILE, "\0"}};
   libjson::Lexer lexer(input);
-  libjson::Token t = lexer.next();
   std::vector<libjson::Token> actual_tokens;
   while (true) {
-    t = lexer.next();
+    libjson::Token t = lexer.next();
+    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
+    actual_tokens.push_back(t);
     if (t.type == TokenTypes::END_OF_FILE) {
       break;
     }
-    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
-    actual_tokens.push_back(t);
   }
 
-  ASSERT_EQ(actual_tokens.size(), expected_tokens.size());
+  EXPECT_EQ(actual_tokens.size(), expected_tokens.size());
   for (size_t i = 0; i < actual_tokens.size(); i++) {
     const auto &actual = actual_tokens[i];
     const auto &expected = expected_tokens[i];

@@ -30,7 +30,8 @@ TEST(Lexer, string_single_can_contain_quote) {
 }
 
 TEST(Lexer, string_can_escape) {
-  libjson::Lexer lexer(R"("string can contain \"escaped\" substrings")");
+  std::string input = R"("string can contain \"escaped\" substrings")";
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
   EXPECT_EQ(t.literal, "string can contain \\\"escaped\\\" substrings");

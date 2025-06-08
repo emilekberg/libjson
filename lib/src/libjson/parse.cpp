@@ -7,6 +7,8 @@
 #include "token_types.h"
 #include <cassert>
 #include <format>
+#include <iostream>
+#include <ostream>
 #include <stdexcept>
 #include <string_view>
 #include <vector>
@@ -109,9 +111,10 @@ Tokenizer tokenize(const std::string_view &input) {
   Token token;
   while (true) {
     token = lexer.next();
+    std::cout << token.literal << std::endl;
     if (token.type == TokenTypes::ILLEGAL) {
-      throw std::runtime_error(
-          std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
+      throw std::runtime_error(std::format(
+          "ILLEGAL TOKEN FOUND: {}, surrounding text", token.literal));
     }
     tokens.push_back(token);
     if (token.type == libjson::TokenTypes::END_OF_FILE) {
