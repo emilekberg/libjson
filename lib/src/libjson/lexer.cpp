@@ -69,34 +69,38 @@ Token Lexer::next() {
 
   else if (isNumber()) {
     size_t start = _position;
-    int numberOfDots = 0;
     int numberOfExponentSign = 0;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       nextChar();
     }
-    // TODO: refactor it
-    while (isDigit() || (current() == '.') || isNumberExponentComponent()) {
-      // 1.53e+10 for instance
-      if (isNumberExponentComponent()) {
-        if ((peekNext() == '+' || peekNext() == '-')) {
-          nextChar();
-        }
-        if (peekNext() < '0' || peekNext() > '9') {
-          // hack to introduce an extra exponent sign to indicate this is an
-          // error
-          numberOfExponentSign = 10;
-        }
-        numberOfExponentSign++;
-      }
-      if (current() == '.') {
-        numberOfDots++;
-      }
+    while (isDigit()) {
       nextChar();
     }
+    if (current() == '.') {
+      nextChar();
+      while (isDigit()) {
+        nextChar();
+      }
+    }
+    if (isNumberExponentComponent()) {
+      nextChar();
+      if ((current() == '+' || current() == '-')) {
+        nextChar();
+      }
+      // validate that we have at least 1 digit after the exponent.
+      if (current() < '0' || current() > '9') {
+        numberOfExponentSign = 10;
+      }
+      while (isDigit()) {
+        nextChar();
+      }
+    }
+
     size_t end = _position;
     std::string_view sub = _input.substr(start, end - start);
-    if (numberOfDots > 1 || numberOfExponentSign > 1) {
+    // if we have a . here we have an issue mr president.
+    if (current() == '.' || numberOfExponentSign > 1) {
       return {TokenTypes::ILLEGAL, sub};
     }
     return {TokenTypes::NUMBER, sub};
@@ -161,6 +165,6 @@ bool Lexer::isEscaped() { return peekPrev() == '\\'; }
 bool Lexer::isEscaped(size_t offset) {
   return _input[_position + offset] == '\\';
 }
-bool Lexer::isDigit() { return (_char >= '0' && _char <= '9') || _char == '.'; }
+bool Lexer::isDigit() { return (_char >= '0' && _char <= '9'); }
 
 } // namespace libjson

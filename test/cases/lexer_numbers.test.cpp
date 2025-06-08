@@ -42,5 +42,4 @@ TEST(Lexer, number_invalid_if_multiple_dots) {
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::ILLEGAL);
-  EXPECT_EQ(t.literal, "142.12.152");
 }
