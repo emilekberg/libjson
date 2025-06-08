@@ -12,6 +12,20 @@ It evaluates numbers from strings when you requrest it so take note of that. Thi
 
 ## How to 
 
+### Clone
+
+To run tests you need the submodules. Either clone by using 
+```bash
+git clone --recurse-submodules --remote-submodules
+```
+
+or sync them later by doing
+
+```bash
+git submodule init
+git submodule update
+```
+
 ### Build
 
 ```bash
