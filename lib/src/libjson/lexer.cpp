@@ -72,24 +72,39 @@ Token Lexer::next() {
     if (current() == '-') {
       nextChar();
     }
-    while (isDigit()) {
+
+    // 0 can only be first, or fraction.
+    if (current() == '0') {
       nextChar();
+      // if we encounter a 0, then a digit, it's invalid.
+      if (isDigit()) {
+        error = true;
+      }
+    } else {
+      // if we didn't encounter a zero, proceed looking at the following numbers
+      while (isDigit()) {
+        nextChar();
+      }
     }
+
+    // if we encounter a dot, process all numbers succeeding it.
     if (current() == '.') {
       nextChar();
       while (isDigit()) {
         nextChar();
       }
     }
+
+    // if the number if exponent, we need to treat that.
     if (isNumberExponentComponent()) {
       nextChar();
       if ((current() == '+' || current() == '-')) {
         nextChar();
       }
+
       // validate that we have at least 1 digit after the exponent.
       if (!isDigit()) {
         error = true;
-        // numberOfExponentSign = 10;
       }
       while (isDigit()) {
         nextChar();

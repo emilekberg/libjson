@@ -36,7 +36,7 @@ INSTANTIATE_TEST_SUITE_P(
 
         // "fail9.json", // trailing comma
         "fail10.json", "fail11.json", "fail12.json",
-        // "fail13.json", // TODO: invalidate number with leading zero.
+        "fail13.json", // TODO: invalidate number with leading zero.
         "fail14.json",
 
         // "fail15.json", // TODO: implement this, validates specific escapes
@@ -48,8 +48,7 @@ INSTANTIATE_TEST_SUITE_P(
         // "fail18.json", // TODO: verify if there is a limit on depth for json
 
         "fail19.json", "fail20.json", "fail21.json", "fail22.json",
-        "fail23.json",
-        "fail24.json", // TODO: strings can only have single quotes?
+        "fail23.json", "fail24.json",
         // "fail25.json", // TODO: validate if this is illegal
         // "fail26.json", // TODO: same as above
         // "fail27.json", // TODO: linebreak in key, fix this
