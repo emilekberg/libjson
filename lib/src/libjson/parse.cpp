@@ -1,10 +1,10 @@
 #include "parse.h"
 #include "json-array.h"
+#include "json-null.h"
+#include "json-number.h"
+#include "json-object.h"
 #include "json-value.h"
 #include "lexer.h"
-#include "libjson/json-null.h"
-#include "libjson/json-number.h"
-#include "libjson/json-object.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
@@ -15,9 +15,20 @@
 namespace libjson {
 JSONValue parse(const std::string_view &input) {
   Tokenizer tokens = tokenize(input);
-  JSONObject result;
-  Token t = tokens.next();
-  return parseValue(t, tokens);
+  Token token = tokens.next();
+  if (token != Token_OpenArray && token != Token_OpenBracket) {
+    std::string err =
+        std::format("expected {} or {}, but got {}", Token_OpenArray.literal,
+                    Token_OpenBracket.literal, token.literal);
+    throw std::invalid_argument(err);
+  }
+  JSONValue result = parseValue(token, tokens);
+  if (tokens.peek() != Token_EndOfFile) {
+    throw std::invalid_argument(std::format(
+        "Unexpected Token after parsing data. Expected {} but got {}",
+        Token_EndOfFile.literal, tokens.peek().literal));
+  }
+  return result;
 }
 
 JSONObject parseObject(Tokenizer &tokens) {
@@ -28,9 +39,14 @@ JSONObject parseObject(Tokenizer &tokens) {
   }
   while (true) {
     Token tKey = tokens.next();
-    assert(tKey.type == TokenTypes::STRING);
+    if (tKey.type != TokenTypes::STRING) {
+      throw std::invalid_argument("expected string but got something else");
+    }
     Token tColon = tokens.next();
-    assert(tColon == Token_Colon);
+    if (tColon != Token_Colon) {
+      throw std::invalid_argument(std::format(
+          "expected {}, but got {}", Token_Colon.literal, tKey.literal));
+    }
 
     Token tValue = tokens.next();
     JSONValue value = parseValue(tValue, tokens);
@@ -47,10 +63,10 @@ JSONObject parseObject(Tokenizer &tokens) {
       return result;
     }
     if (tEnd != Token_Comma) {
-      throw new std::invalid_argument(std::format(
-          "parseObject: Unexpected token {}", std::string(tEnd.literal)));
+      throw std::invalid_argument(std::format(
+          "parseObject: UnexpectedToken. Expected {} or {}, but got {}",
+          Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
     }
-    assert(tEnd == Token_Comma);
   }
   return result;
 }
@@ -78,7 +94,11 @@ JSONArray parseArray(Tokenizer &tokens) {
       tokens.next();
       return result;
     }
-    assert(tEnd == Token_Comma);
+    if (tEnd != Token_Comma) {
+      throw std::invalid_argument(std::format(
+          "parseArray: Unexpected Token. Expected {} or {}, but got {}",
+          Token_Comma.literal, Token_CloseArray.literal, tEnd.literal));
+    }
   }
 
   return result;
@@ -117,17 +137,17 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
     } else if (token == Token_OpenArray) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
     } else {
-      throw std::runtime_error(std::format(
+      throw std::invalid_argument(std::format(
           "ParseJSONObject: Unexpected separator: {}.", token.literal));
     }
   } break;
   case TokenTypes::ILLEGAL:
-    throw std::runtime_error("ParseJSONObject: Reached illegal token");
+    throw std::invalid_argument("ParseJSONObject: Reached illegal token");
   case TokenTypes::END_OF_FILE:
-    throw std::runtime_error(
+    throw std::invalid_argument(
         "ParseJSONObject: Reached EOF token when not expecting to.");
   }
-  throw std::runtime_error("ParseJSONObject: Should never reach here.");
+  throw std::invalid_argument("ParseJSONObject: Should never reach here.");
 }
 
 Tokenizer tokenize(const std::string_view &input) {
@@ -138,7 +158,7 @@ Tokenizer tokenize(const std::string_view &input) {
     token = lexer.next();
     // std::cout << token.literal << std::endl;
     if (token.type == TokenTypes::ILLEGAL) {
-      throw std::runtime_error(std::format(
+      throw std::invalid_argument(std::format(
           "ILLEGAL TOKEN FOUND: {}, surrounding text", token.literal));
     }
     tokens.push_back(token);

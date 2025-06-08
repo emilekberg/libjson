@@ -12,12 +12,12 @@ static std::string loadFile(const std::string &path) {
 }
 
 int main() {
-  std::string json = loadFile("data/large-file.json");
-  //   std::string json = R"({
-  //     "public": true,
-  //     "created_at": "2015-01-01T15:00:00Z",
-  // })";
-  auto result = libjson::parse(json);
+  // std::string json = loadFile("data/twitter.json");
+  //    std::string json = R"({
+  //      "public": true,
+  //      "created_at": "2015-01-01T15:00:00Z",
+  //  })";
+  libjson::JSONValue val = libjson::parse(R"(["<-- missing value"],)");
   // auto val = result.get<libjson::JSONObject>();
   return 0;
 }

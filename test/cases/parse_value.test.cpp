@@ -55,10 +55,7 @@ TEST(parse, value_literal_null) {
 
 TEST(Parse, object_empty_object) {
   std::string input = R"({})";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
 
-  // we know first token is an array, so discard it.
-  tokens.next();
   libjson::JSONValue value = libjson::parse(input);
   ASSERT_EQ(value.type, libjson::JSONValueType::OBJECT);
 
@@ -68,10 +65,6 @@ TEST(Parse, object_empty_object) {
 
 TEST(parse, array_empty_array) {
   std::string input = R"([])";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
-
-  // we know first token is an array, so discard it.
-  tokens.next();
   libjson::JSONValue value = libjson::parse(input);
   ASSERT_EQ(value.type, libjson::JSONValueType::ARRAY);
 

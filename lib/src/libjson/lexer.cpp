@@ -1,5 +1,6 @@
 #include "lexer.h"
 #include "libjson/token_types.h"
+#include <algorithm>
 
 namespace libjson {
 Lexer::Lexer(const std::string_view &input) : _input(input), _exit(false) {
@@ -107,7 +108,9 @@ Token Lexer::next() {
     return {TokenTypes::LITERAL, _input.substr(start, end - start)};
   }
 
-  return {TokenTypes::ILLEGAL, _input.substr(_position - 10, 20)};
+  size_t start = std::max(0, (int)_position - 10);
+  size_t count = std::min(20, (int)(_input.size() - start));
+  return {TokenTypes::ILLEGAL, _input.substr(start, count)};
 }
 
 bool Lexer::isWhitespace() {

@@ -28,3 +28,8 @@ include(GoogleTest)
 
 enable_testing()
 gtest_discover_tests(libjson_test)
+
+
+file(MAKE_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/data)
+file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/../data/
+     DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/data/)

@@ -10,6 +10,11 @@ It uses `std::string_view` internally so make sure your string outlives the pars
 
 It evaluates numbers from strings when you requrest it so take note of that. This is tradeoff for sake of supporting more arithmetic types.
 
+## Todo
+
+- Add https://github.com/briandfoy/json-acceptance-tests/tree/master
+
+
 
 ## Benchmark
 
