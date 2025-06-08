@@ -10,11 +10,11 @@ TEST(parse, array_of_numbers) {
   tokens.next();
   libjson::JSONArray array = libjson::parseArray(tokens);
 
-  ASSERT_EQ(array.data.size(), 7);
+  ASSERT_EQ(array.size(), 7);
 
-  for (size_t i = 0; i < array.data.size(); i++) {
+  for (size_t i = 0; i < array.size(); i++) {
     double expected = expected_arr[i];
-    double actual = array.data[i].get<double>();
+    double actual = array[i].get<double>();
 
     EXPECT_EQ(actual, expected);
   }

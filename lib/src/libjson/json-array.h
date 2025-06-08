@@ -4,7 +4,15 @@
 namespace libjson {
 class JSONArray {
 public:
-  std::vector<JSONValue> data;
+  void add(JSONValue &value) { _data.emplace_back(value); }
+  std::vector<JSONValue>::iterator begin() { return _data.begin(); }
+  std::vector<JSONValue>::iterator end() { return _data.end(); }
+  JSONValue &operator[](size_t index) { return _data[index]; }
+
+  size_t size() { return _data.size(); }
+
+private:
+  std::vector<JSONValue> _data;
 };
 
 } // namespace libjson

@@ -2,6 +2,7 @@
 #include "json-array.h"
 #include "json-value.h"
 #include "lexer.h"
+#include "libjson/json-number.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
@@ -43,7 +44,7 @@ JSONArray parseArray(Tokenizer &tokens) {
     Token token = tokens.next();
     JSONValue value = parseValue(token, tokens);
 
-    result.data.push_back(value);
+    result.add(value);
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseArray) {
@@ -56,8 +57,9 @@ JSONArray parseArray(Tokenizer &tokens) {
 }
 
 JSONValue parseNumber(const Token &token) {
-  double d = std::stod(token.literal);
-  return {JSONValueType::NUMBER, d};
+  JSONNumber number(token.literal);
+  // double d = std::stod(token.literal);
+  return {JSONValueType::NUMBER, number};
 }
 
 JSONValue parseLiteral(const Token &token) {
