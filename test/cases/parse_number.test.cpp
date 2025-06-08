@@ -5,7 +5,6 @@
 
 TEST(parse, number_int) {
   libjson::Tokenizer tokens = libjson::tokenize(R"(420)");
-  // we know first token is an array, so discard it.
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseNumber(token);
 
