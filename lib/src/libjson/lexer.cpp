@@ -50,6 +50,8 @@ Token Lexer::next() {
     // if it's escaped, ignore it.
     while (!(current() == search)) {
       // if we stumble opon an escape sign, we do some skips.
+      // TODO: validate what we can skip. only certain characters can be
+      // escaped according to the specification.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
         nextChar();
@@ -68,11 +70,24 @@ Token Lexer::next() {
   else if (isNumber()) {
     size_t start = _position;
     int numberOfDots = 0;
+    int numberOfExponentSign = 0;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       nextChar();
     }
-    while (isDigit() || (current() == '.')) {
+    while (isDigit() || (current() == '.') || isNumberExponentComponent()) {
+      // 1.53e+10 for instance
+      if (isNumberExponentComponent()) {
+        if ((peekNext() == '+' || peekNext() == '-')) {
+          nextChar();
+        }
+        if (peekNext() < '0' || peekNext() > '9') {
+          // hack to introduce an extra exponent sign to indicate this is an
+          // error
+          numberOfExponentSign = 10;
+        }
+        numberOfExponentSign++;
+      }
       if (current() == '.') {
         numberOfDots++;
       }
@@ -80,7 +95,7 @@ Token Lexer::next() {
     }
     size_t end = _position;
     std::string_view sub = _input.substr(start, end - start);
-    if (numberOfDots > 1) {
+    if (numberOfDots > 1 || numberOfExponentSign > 1) {
       return {TokenTypes::ILLEGAL, sub};
     }
     return {TokenTypes::NUMBER, sub};
@@ -134,6 +149,7 @@ bool Lexer::isEndOfFile() {
   return _position >= _input.size() || current() == '\0';
 }
 bool Lexer::isNumber() { return isDigit() || _char == '-'; }
+bool Lexer::isNumberExponentComponent() { return _char == 'e' || _char == 'E'; }
 bool Lexer::isString() { return _char == '"' || _char == '\''; }
 bool Lexer::isLiteral() { return _char == 'f' || _char == 't' || _char == 'n'; }
 bool Lexer::isSeparator() {

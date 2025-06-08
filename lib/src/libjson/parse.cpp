@@ -158,8 +158,8 @@ Tokenizer tokenize(const std::string_view &input) {
     token = lexer.next();
     // std::cout << token.literal << std::endl;
     if (token.type == TokenTypes::ILLEGAL) {
-      throw std::invalid_argument(std::format(
-          "ILLEGAL TOKEN FOUND: {}, surrounding text", token.literal));
+      throw std::invalid_argument(
+          std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
     }
     tokens.push_back(token);
     if (token.type == libjson::TokenTypes::END_OF_FILE) {

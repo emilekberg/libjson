@@ -1,6 +1,5 @@
 #pragma once
 #include "token.h"
-#include <string>
 #include <string_view>
 
 namespace libjson {
@@ -22,6 +21,7 @@ public:
   bool isEscaped();
   bool isEscaped(size_t offset);
   bool isDigit();
+  bool isNumberExponentComponent();
   bool isEndOfFile();
 
 private:

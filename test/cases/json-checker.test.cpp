@@ -59,7 +59,7 @@ INSTANTIATE_TEST_SUITE_P(
 
 TEST_P(JsonCheckerPassesTests, fails) {
   EXPECT_FALSE(filecontent.empty());
-  EXPECT_THROW(libjson::parse(filecontent), std::invalid_argument);
+  EXPECT_NO_THROW(libjson::parse(filecontent));
 }
 INSTANTIATE_TEST_SUITE_P(JsonCheckerTestSuite, JsonCheckerPassesTests,
                          ::testing::Values("pass1.json", "pass2.json",
