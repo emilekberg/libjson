@@ -5,7 +5,7 @@
 
 TEST(parse, value_string) {
   std::string input = R"("someString")";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
+  libjson::LazyTokenizer tokens(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -15,7 +15,7 @@ TEST(parse, value_string) {
 
 TEST(parse, value_double) {
   std::string input = R"(1234.56)";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
+  libjson::LazyTokenizer tokens(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -25,7 +25,7 @@ TEST(parse, value_double) {
 
 TEST(parse, value_literal_true) {
   std::string input = R"(true)";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
+  libjson::LazyTokenizer tokens(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -35,7 +35,7 @@ TEST(parse, value_literal_true) {
 
 TEST(parse, value_literal_false) {
   std::string input = R"(false)";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
+  libjson::LazyTokenizer tokens(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
@@ -45,7 +45,7 @@ TEST(parse, value_literal_false) {
 
 TEST(parse, value_literal_null) {
   std::string input = R"(null)";
-  libjson::Tokenizer tokens = libjson::tokenize(input);
+  libjson::LazyTokenizer tokens(input);
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 

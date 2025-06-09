@@ -5,22 +5,19 @@
 namespace libjson {
 Lexer::Lexer(const std::string_view &input) : _input(input), _position{} {}
 
-void Lexer::nextChar() {
-  if (++_position >= _input.size()) {
-    return;
-  }
-}
+void Lexer::nextChar() { ++_position; }
 const char &Lexer::current() const { return _input[_position]; }
 
 Token Lexer::next() {
   while (isWhitespace()) {
     nextChar();
   }
-  // used when iterating to also return the EOF token.
-  if (_position > _input.size()) {
-    return {TokenTypes::NONE, "\0"};
-  }
   if (isEndOfFile()) {
+    // if we have read beyond input size, have read the entire buffer.
+    // this is used when using the iterator.
+    if (_position > _input.size()) {
+      return {TokenTypes::NONE, "\0"};
+    }
     // increment the position beyond the input, this signals that we have
     // processed the entire buffer.
     ++_position;
@@ -111,7 +108,7 @@ Token Lexer::next() {
   }
 
   else if (isLiteral()) {
-    std::string expected_literal = "";
+    std::string_view expected_literal;
     size_t start = _position;
     if (current() == 'f') {
       expected_literal = "false";
@@ -132,9 +129,6 @@ Token Lexer::next() {
   }
 
   return {TokenTypes::ILLEGAL, ""};
-  // size_t start = std::max(0, (int)_position - 10);
-  // size_t count = std::min(20, (int)(_input.size() - start));
-  // return {TokenTypes::ILLEGAL, _input.substr(start, count)};
 }
 
 bool Lexer::isWhitespace() const {

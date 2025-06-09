@@ -14,7 +14,7 @@
 #include <vector>
 namespace libjson {
 JSONValue parse(const std::string_view &input) {
-  Tokenizer tokens = tokenize(input);
+  LazyTokenizer tokens(input);
   Token token = tokens.next();
   if (token != Token_OpenBracket && token != Token_OpenBracer) {
     std::string err =
@@ -31,7 +31,7 @@ JSONValue parse(const std::string_view &input) {
   return result;
 }
 
-JSONObject parseObject(Tokenizer &tokens) {
+JSONObject parseObject(LazyTokenizer &tokens) {
   JSONObject result;
   if (tokens.peek() == Token_CloseBracer) {
     tokens.next();
@@ -55,13 +55,13 @@ JSONObject parseObject(Tokenizer &tokens) {
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracer) {
-      return result;
+      break;
     }
+
+    // support trailing comma
     if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
-      // support trailing comma
-      // discard
       tokens.next();
-      return result;
+      break;
     }
     if (tEnd != Token_Comma) {
       throw std::invalid_argument(std::format(
@@ -72,7 +72,7 @@ JSONObject parseObject(Tokenizer &tokens) {
   return result;
 }
 
-JSONArray parseArray(Tokenizer &tokens) {
+JSONArray parseArray(LazyTokenizer &tokens) {
   JSONArray result;
   if (tokens.peek() == Token_CloseBracket) {
     tokens.next();
@@ -121,50 +121,38 @@ JSONValue parseLiteral(const Token &token) {
   throw std::runtime_error("should never come here");
 }
 
-JSONValue parseValue(const Token &token, Tokenizer &tokens) {
+JSONValue parseValue(const Token &token, LazyTokenizer &tokens) {
   switch (token.type) {
-  case TokenTypes::STRING: {
+  case TokenTypes::STRING:
     return {JSONValueType::STRING, std::string(token.literal)};
-  } break;
-  case TokenTypes::NUMBER: {
+
+  case TokenTypes::NUMBER:
     return parseNumber(token);
-  } break;
-  case TokenTypes::LITERAL: {
+
+  case TokenTypes::LITERAL:
     return parseLiteral(token);
-  } break;
-  case TokenTypes::SEPARATOR: {
+
+  case TokenTypes::SEPARATOR:
     if (token == Token_OpenBracer) {
       return {JSONValueType::OBJECT, parseObject(tokens)};
     } else if (token == Token_OpenBracket) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
-    } else {
-      throw std::invalid_argument(std::format(
-          "ParseJSONValue: Unexpected separator: {}.", token.literal));
     }
-  } break;
+    throw std::invalid_argument(std::format(
+        "ParseJSONValue: Unexpected separator: {}.", token.literal));
+
   case TokenTypes::ILLEGAL:
     throw std::invalid_argument("ParseJSONValue: Reached illegal token");
+
   case TokenTypes::END_OF_FILE:
     throw std::invalid_argument(
         "ParseJSONValue: Reached EOF token when not expecting to.");
+
   case TokenTypes::HEAD:
   case TokenTypes::NONE:
     throw std::invalid_argument(
         "ParseJSONValue: Unexpected token type HEAD or NONE.");
-    break;
   }
   throw std::invalid_argument("ParseJSONValue: Should never reach here.");
-}
-
-Tokenizer tokenize(const std::string_view &input) {
-  std::vector<Token> tokens;
-  for (const auto token : Lexer(input)) {
-    if (token.type == TokenTypes::ILLEGAL) {
-      throw std::invalid_argument(
-          std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
-    }
-    tokens.push_back(token);
-  };
-  return {tokens};
 }
 } // namespace libjson

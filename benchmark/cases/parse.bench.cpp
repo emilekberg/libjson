@@ -1,3 +1,5 @@
+#include "libjson/lexer.h"
+#include "libjson/tokenizer.h"
 #include <benchmark/benchmark.h>
 #include <format>
 #include <fstream>
@@ -13,10 +15,11 @@ static std::string loadFile(const std::string &path) {
 void RegisterParserBenchmark(const std::string &name, const std::string &path) {
   benchmark::RegisterBenchmark(name.c_str(), [path](benchmark::State &state) {
     std::string json = loadFile(path);
-    auto tokens = libjson::tokenize(json);
     for (auto _ : state) {
       // reset position of tokenizer.
-      tokens.pos = 0;
+      // tokens.pos = 0;
+
+      auto tokens = libjson::LazyTokenizer(json);
       auto result = libjson::parseValue(tokens.next(), tokens);
       benchmark::DoNotOptimize(result);
     }
@@ -27,8 +30,9 @@ void RegisterLexerBenchmark(const std::string &name, const std::string &path) {
   benchmark::RegisterBenchmark(name.c_str(), [path](benchmark::State &state) {
     std::string json = loadFile(path);
     for (auto _ : state) {
-      auto tokens = libjson::tokenize(json);
-      benchmark::DoNotOptimize(tokens);
+      for (auto token : libjson::Lexer(json)) {
+        benchmark::DoNotOptimize(token);
+      }
     }
   });
 }

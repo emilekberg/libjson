@@ -2,6 +2,7 @@
 #include <charconv>
 #include <stdexcept>
 #include <string>
+#include <type_traits>
 
 namespace libjson {
 class JSONNumber {
@@ -9,11 +10,10 @@ public:
   JSONNumber(const std::string &literal) : _literal(literal) {}
 
   template <typename T> T get() {
+    static_assert(std::is_arithmetic_v<T>, "T must be an arithmetic type");
     T value;
-    const char *begin = _literal.data();
-    const char *end = _literal.data() + _literal.size();
-
-    auto result = std::from_chars(begin, end, value);
+    auto result = std::from_chars(_literal.data(),
+                                  _literal.data() + _literal.size(), value);
     if (result.ec != std::errc{}) {
       throw std::invalid_argument("Invalid integer: " + _literal);
     }

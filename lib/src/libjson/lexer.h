@@ -1,5 +1,6 @@
 #pragma once
 #include "token.h"
+#include <array>
 #include <string_view>
 
 namespace libjson {
@@ -57,5 +58,4 @@ private:
   std::string_view _input;
   size_t _position;
 };
-
 } // namespace libjson
