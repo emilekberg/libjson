@@ -10,11 +10,11 @@ VectorTokenizer::VectorTokenizer(std::string_view json) {
       throw std::invalid_argument(
           std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
     }
-    tokens.push_back(token);
+    _tokens.push_back(token);
   }
 }
-const Token &VectorTokenizer::next() { return tokens[pos++]; }
-const Token &VectorTokenizer::peek() { return tokens[pos]; }
+const Token &VectorTokenizer::next() { return _tokens[_pos++]; }
+const Token &VectorTokenizer::peek() { return _tokens[_pos]; }
 
 LazyTokenizer::LazyTokenizer(std::string_view json) : _lexer(json) {}
 Token LazyTokenizer::next() {

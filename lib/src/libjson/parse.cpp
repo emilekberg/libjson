@@ -80,7 +80,6 @@ JSONArray parseArray(LazyTokenizer &tokens) {
   while (true) {
     Token token = tokens.next();
     JSONValue value = parseValue(token, tokens);
-
     result.add(value);
 
     Token tEnd = tokens.next();
@@ -89,7 +88,6 @@ JSONArray parseArray(LazyTokenizer &tokens) {
     }
     if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
       // support trailing comma
-      // discard
       tokens.next();
       return result;
     }

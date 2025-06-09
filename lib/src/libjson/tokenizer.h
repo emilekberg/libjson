@@ -13,8 +13,8 @@ public:
   const Token &peek();
 
 private:
-  std::vector<Token> tokens;
-  size_t pos{};
+  std::vector<Token> _tokens;
+  size_t _pos{};
 };
 
 class LazyTokenizer {
