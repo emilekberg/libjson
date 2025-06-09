@@ -1,24 +1,16 @@
 #include "lexer.h"
 #include "libjson/token_types.h"
-#include <algorithm>
+#include <string>
 
 namespace libjson {
-Lexer::Lexer(const std::string_view &input) : _input(input), _exit(false) {
-  _position = 0;
-  _nextPosition = 1;
-  _char = _input[0];
-}
+Lexer::Lexer(const std::string_view &input) : _input(input), _position{} {}
 
 void Lexer::nextChar() {
-  _position = _nextPosition;
-  _nextPosition++;
-  if (_position >= _input.size()) {
-    _char = '\0';
+  if (++_position >= _input.size()) {
     return;
   }
-  _char = _input[_position];
 }
-char Lexer::current() const { return _char; }
+const char &Lexer::current() const { return _input[_position]; }
 
 Token Lexer::next() {
   while (isWhitespace()) {
@@ -29,14 +21,14 @@ Token Lexer::next() {
     return {TokenTypes::NONE, "\0"};
   }
   if (isEndOfFile()) {
+    // increment the position beyond the input, this signals that we have
+    // processed the entire buffer.
     ++_position;
     return {TokenTypes::END_OF_FILE, "\0"};
   }
   if (isSeparator()) {
-    size_t start = _position;
-    size_t end = _nextPosition;
     nextChar();
-    return {TokenTypes::SEPARATOR, _input.substr(start, end - start)};
+    return {TokenTypes::SEPARATOR, _input.substr(_position - 1, 1)};
   }
 
   else if (isString()) {
@@ -47,17 +39,13 @@ Token Lexer::next() {
     // if it's escaped, ignore it.
     while (!isString()) {
       // if we stumble opon an escape sign, we do some skips.
-      // TODO: validate what we can skip. only certain characters can be
-      // escaped according to the specification.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
         nextChar();
-        // this is the escaped sign, we skip this as well.
-        nextChar();
-      } else {
-        // otherwise we just skip one
-        nextChar();
+        // TODO: we are now at the escaped sign.
+        // we need to verify what this is, or return invalid token.
       }
+      nextChar();
     }
     size_t end = _position;
     nextChar();
@@ -66,7 +54,7 @@ Token Lexer::next() {
 
   else if (isNumber()) {
     size_t start = _position;
-    std::string error = "";
+    std::string error;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       nextChar();
@@ -117,7 +105,7 @@ Token Lexer::next() {
       error = "too many .";
     }
     if (!error.empty()) {
-      return {TokenTypes::ILLEGAL, error};
+      return {TokenTypes::ILLEGAL, sub};
     }
     return {TokenTypes::NUMBER, sub};
   }
@@ -140,45 +128,32 @@ Token Lexer::next() {
       }
       nextChar();
     }
-    end = start + expected_literal.size();
-    return {TokenTypes::LITERAL, _input.substr(start, end - start)};
+    return {TokenTypes::LITERAL, _input.substr(start, expected_literal.size())};
   }
 
-  size_t start = std::max(0, (int)_position - 10);
-  size_t count = std::min(20, (int)(_input.size() - start));
-  return {TokenTypes::ILLEGAL, _input.substr(start, count)};
+  return {TokenTypes::ILLEGAL, ""};
+  // size_t start = std::max(0, (int)_position - 10);
+  // size_t count = std::min(20, (int)(_input.size() - start));
+  // return {TokenTypes::ILLEGAL, _input.substr(start, count)};
 }
 
 bool Lexer::isWhitespace() const {
-  if (_char == ' ') {
-    return true;
-  }
-  if (_char == '\t') {
-    return true;
-  }
-  if (_char == '\n') {
-    return true;
-  }
-  if (_char == '\r') {
-    return true;
-  }
-  return false;
+  return current() == ' ' || current() == '\t' || current() == '\n' ||
+         current() == '\r';
 }
-// TODO: this is not corrent
-// should be able to use only the size to figure this out, not the current...
 bool Lexer::isEndOfFile() const { return _position >= _input.size(); }
-bool Lexer::isNumber() const { return isDigit() || _char == '-'; }
+bool Lexer::isNumber() const { return isDigit() || current() == '-'; }
 bool Lexer::isNumberExponentComponent() const {
-  return _char == 'e' || _char == 'E';
+  return current() == 'e' || current() == 'E';
 }
-bool Lexer::isString() const { return _char == '"'; }
+bool Lexer::isString() const { return current() == '"'; }
 bool Lexer::isLiteral() const {
-  return _char == 'f' || _char == 't' || _char == 'n';
+  return current() == 'f' || current() == 't' || current() == 'n';
 }
 bool Lexer::isSeparator() const {
-  return _char == '{' || _char == '}' || _char == '[' || _char == ']' ||
-         _char == ':' || _char == ',';
+  return current() == '{' || current() == '}' || current() == '[' ||
+         current() == ']' || current() == ':' || current() == ',';
 }
-bool Lexer::isDigit() const { return (_char >= '0' && _char <= '9'); }
+bool Lexer::isDigit() const { return (current() >= '0' && current() <= '9'); }
 
 } // namespace libjson

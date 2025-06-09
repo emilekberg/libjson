@@ -43,7 +43,7 @@ public:
 
 private:
   inline void nextChar();
-  inline char current() const;
+  inline const char &current() const;
 
   inline bool isWhitespace() const;
   inline bool isSeparator() const;
@@ -56,9 +56,6 @@ private:
 
   std::string_view _input;
   size_t _position;
-  size_t _nextPosition;
-  char _char;
-  bool _exit = false;
 };
 
 } // namespace libjson

@@ -139,16 +139,21 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
     } else {
       throw std::invalid_argument(std::format(
-          "ParseJSONObject: Unexpected separator: {}.", token.literal));
+          "ParseJSONValue: Unexpected separator: {}.", token.literal));
     }
   } break;
   case TokenTypes::ILLEGAL:
-    throw std::invalid_argument("ParseJSONObject: Reached illegal token");
+    throw std::invalid_argument("ParseJSONValue: Reached illegal token");
   case TokenTypes::END_OF_FILE:
     throw std::invalid_argument(
-        "ParseJSONObject: Reached EOF token when not expecting to.");
+        "ParseJSONValue: Reached EOF token when not expecting to.");
+  case TokenTypes::HEAD:
+  case TokenTypes::NONE:
+    throw std::invalid_argument(
+        "ParseJSONValue: Unexpected token type HEAD or NONE.");
+    break;
   }
-  throw std::invalid_argument("ParseJSONObject: Should never reach here.");
+  throw std::invalid_argument("ParseJSONValue: Should never reach here.");
 }
 
 Tokenizer tokenize(const std::string_view &input) {

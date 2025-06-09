@@ -13,15 +13,12 @@ static std::string loadFile(const std::string &path) {
 }
 
 int main() {
-  // std::string json = loadFile("data/json-checker/pass1.json");
+  std::string json = loadFile("data/large-file.json");
   //    std::string json = R"({
   //      "public": true,
   //      "created_at": "2015-01-01T15:00:00Z",
   //  })";
-  auto val = libjson::Lexer("[0123]");
-  for (auto token : val) {
-    std::cout << token.literal << std::endl;
-  }
+  libjson::parse(json);
   // auto val = result.get<libjson::JSONObject>();
   return 0;
 }
