@@ -16,10 +16,10 @@ namespace libjson {
 JSONValue parse(const std::string_view &input) {
   Tokenizer tokens = tokenize(input);
   Token token = tokens.next();
-  if (token != Token_OpenArray && token != Token_OpenBracket) {
+  if (token != Token_OpenBracket && token != Token_OpenBracer) {
     std::string err =
-        std::format("expected {} or {}, but got {}", Token_OpenArray.literal,
-                    Token_OpenBracket.literal, token.literal);
+        std::format("expected {} or {}, but got {}", Token_OpenBracket.literal,
+                    Token_OpenBracer.literal, token.literal);
     throw std::invalid_argument(err);
   }
   JSONValue result = parseValue(token, tokens);
@@ -33,7 +33,7 @@ JSONValue parse(const std::string_view &input) {
 
 JSONObject parseObject(Tokenizer &tokens) {
   JSONObject result;
-  if (tokens.peek() == Token_CloseBracket) {
+  if (tokens.peek() == Token_CloseBracer) {
     tokens.next();
     return result;
   }
@@ -54,10 +54,10 @@ JSONObject parseObject(Tokenizer &tokens) {
     result.add(std::string(tKey.literal), value);
 
     Token tEnd = tokens.next();
-    if (tEnd == Token_CloseBracket) {
+    if (tEnd == Token_CloseBracer) {
       return result;
     }
-    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracket) {
+    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
       // support trailing comma
       // discard
       tokens.next();
@@ -66,7 +66,7 @@ JSONObject parseObject(Tokenizer &tokens) {
     if (tEnd != Token_Comma) {
       throw std::invalid_argument(std::format(
           "parseObject: UnexpectedToken. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
+          Token_Comma.literal, Token_CloseBracer.literal, tEnd.literal));
     }
   }
   return result;
@@ -74,7 +74,7 @@ JSONObject parseObject(Tokenizer &tokens) {
 
 JSONArray parseArray(Tokenizer &tokens) {
   JSONArray result;
-  if (tokens.peek() == Token_CloseArray) {
+  if (tokens.peek() == Token_CloseBracket) {
     tokens.next();
     return result;
   }
@@ -86,10 +86,10 @@ JSONArray parseArray(Tokenizer &tokens) {
     result.add(value);
 
     Token tEnd = tokens.next();
-    if (tEnd == Token_CloseArray) {
+    if (tEnd == Token_CloseBracket) {
       return result;
     }
-    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracket) {
+    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
       // support trailing comma
       // discard
       tokens.next();
@@ -98,7 +98,7 @@ JSONArray parseArray(Tokenizer &tokens) {
     if (tEnd != Token_Comma) {
       throw std::invalid_argument(std::format(
           "parseArray: Unexpected Token. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseArray.literal, tEnd.literal));
+          Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
     }
   }
 
@@ -133,9 +133,9 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
     return parseLiteral(token);
   } break;
   case TokenTypes::SEPARATOR: {
-    if (token == Token_OpenBracket) {
+    if (token == Token_OpenBracer) {
       return {JSONValueType::OBJECT, parseObject(tokens)};
-    } else if (token == Token_OpenArray) {
+    } else if (token == Token_OpenBracket) {
       return {JSONValueType::ARRAY, parseArray(tokens)};
     } else {
       throw std::invalid_argument(std::format(
@@ -153,20 +153,13 @@ JSONValue parseValue(const Token &token, Tokenizer &tokens) {
 
 Tokenizer tokenize(const std::string_view &input) {
   std::vector<Token> tokens;
-  Lexer lexer(input);
-  Token token;
-  while (true) {
-    token = lexer.next();
-    // std::cout << token.literal << std::endl;
+  for (const auto token : Lexer(input)) {
     if (token.type == TokenTypes::ILLEGAL) {
       throw std::invalid_argument(
           std::format("ILLEGAL TOKEN FOUND: {}", token.literal));
     }
     tokens.push_back(token);
-    if (token.type == libjson::TokenTypes::END_OF_FILE) {
-      break;
-    }
-  }
+  };
   return {tokens};
 }
 } // namespace libjson

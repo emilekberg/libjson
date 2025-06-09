@@ -24,7 +24,12 @@ Token Lexer::next() {
   while (isWhitespace()) {
     nextChar();
   }
-  if (isEndOfFile() || current() == '\0') {
+  // used when iterating to also return the EOF token.
+  if (_position > _input.size()) {
+    return {TokenTypes::NONE, "\0"};
+  }
+  if (isEndOfFile()) {
+    ++_position;
     return {TokenTypes::END_OF_FILE, "\0"};
   }
   if (isSeparator()) {
@@ -72,7 +77,7 @@ Token Lexer::next() {
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) {
-        std::string error = "leading zero";
+        error = "leading zero";
       }
     } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
@@ -161,9 +166,7 @@ bool Lexer::isWhitespace() const {
 }
 // TODO: this is not corrent
 // should be able to use only the size to figure this out, not the current...
-bool Lexer::isEndOfFile() const {
-  return _position >= _input.size() || current() == '\0';
-}
+bool Lexer::isEndOfFile() const { return _position >= _input.size(); }
 bool Lexer::isNumber() const { return isDigit() || _char == '-'; }
 bool Lexer::isNumberExponentComponent() const {
   return _char == 'e' || _char == 'E';

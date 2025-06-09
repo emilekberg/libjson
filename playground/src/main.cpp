@@ -1,3 +1,4 @@
+#include "libjson/lexer.h"
 #include <fstream>
 #include <iostream>
 #include <libjson/json-object.h>
@@ -17,7 +18,10 @@ int main() {
   //      "public": true,
   //      "created_at": "2015-01-01T15:00:00Z",
   //  })";
-  libjson::JSONValue val = libjson::parse("[0123]");
+  auto val = libjson::Lexer("[0123]");
+  for (auto token : val) {
+    std::cout << token.literal << std::endl;
+  }
   // auto val = result.get<libjson::JSONObject>();
   return 0;
 }

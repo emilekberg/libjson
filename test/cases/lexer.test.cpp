@@ -3,6 +3,7 @@
 #include <libjson/lexer.h>
 
 using namespace libjson;
+
 TEST(Lexer, skips_leading_whitespace) {
   libjson::Lexer lexer(R"(       "ignored leading whitespace"      )");
   libjson::Token t = lexer.next();
@@ -23,7 +24,6 @@ TEST(Lexer, skips_middle_whitespace) {
 }
 
 TEST(Lexer, eof) {
-  GTEST_SKIP_("flaky on windows?");
   libjson::Lexer lexer("");
   libjson::Token t = lexer.next();
 
@@ -48,13 +48,14 @@ TEST(Lexer, string_escape_edgecase) {
       {TokenTypes::LITERAL, "true"},
       {TokenTypes::SEPARATOR, "}"},
       {TokenTypes::END_OF_FILE, "\0"}};
-  libjson::Lexer lexer(input);
   std::vector<libjson::Token> actual_tokens;
+
+  Lexer lexer(input);
   while (true) {
-    libjson::Token t = lexer.next();
-    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
-    actual_tokens.push_back(t);
-    if (t.type == TokenTypes::END_OF_FILE) {
+    Token token = lexer.next();
+    ASSERT_NE(token.type, TokenTypes::ILLEGAL);
+    actual_tokens.push_back(token);
+    if (token.type == TokenTypes::END_OF_FILE) {
       break;
     }
   }
@@ -69,7 +70,7 @@ TEST(Lexer, string_escape_edgecase) {
   }
 }
 
-TEST(Lexer, literal_bools) {
+TEST(Lexer, trailing_comma) {
   std::string input = R"({
     "public": true,
     "created_at": "2015-01-01T15:00:00Z",
@@ -88,13 +89,13 @@ TEST(Lexer, literal_bools) {
       {TokenTypes::SEPARATOR, "}"},
       {TokenTypes::END_OF_FILE, "\0"}};
 
-  libjson::Lexer lexer(input);
   std::vector<libjson::Token> actual_tokens;
+  Lexer lexer(input);
   while (true) {
-    libjson::Token t = lexer.next();
-    ASSERT_NE(t.type, TokenTypes::ILLEGAL);
-    actual_tokens.push_back(t);
-    if (t.type == TokenTypes::END_OF_FILE) {
+    Token token = lexer.next();
+    ASSERT_NE(token.type, TokenTypes::ILLEGAL);
+    actual_tokens.push_back(token);
+    if (token.type == TokenTypes::END_OF_FILE) {
       break;
     }
   }
@@ -107,4 +108,32 @@ TEST(Lexer, literal_bools) {
     EXPECT_EQ(actual.type, expected.type);
     EXPECT_EQ(actual.literal, expected.literal);
   }
+}
+
+TEST(Lexer, iterator) {
+  std::string input = R"({
+    "public": true,
+    "created_at": "2015-01-01T15:00:00Z",
+})";
+
+  std::vector<libjson::Token> expected_tokens = {
+      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::STRING, "public"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::LITERAL, "true"},
+      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::STRING, "created_at"},
+      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
+      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::END_OF_FILE, "\0"}};
+
+  size_t count = 0;
+  for (auto actual : Lexer(input)) {
+    Token expected = expected_tokens[count++];
+    EXPECT_EQ(actual.type, expected.type);
+    EXPECT_EQ(actual.literal, expected.literal);
+  }
+  ASSERT_EQ(count, expected_tokens.size());
 }
