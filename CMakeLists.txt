@@ -6,8 +6,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 add_subdirectory(lib)
-add_subdirectory(playground)
-add_subdirectory(benchmark)
 
-enable_testing()
-add_subdirectory(test)
+
+if(BUILD_TESTING)
+	add_subdirectory(benchmark)
+endif()
+include(CTest) 
+if(BUILD_TESTING)
+	add_subdirectory(playground)
+	enable_testing()
+	add_subdirectory(test)
+endif()
