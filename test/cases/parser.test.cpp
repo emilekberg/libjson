@@ -25,12 +25,12 @@ TEST(Parser, parses_object_two_keys) {
   ASSERT_TRUE(result.has("b"));
 
   libjson::JSONValue valueA = result.getValue("a");
-  EXPECT_EQ(valueA.type, libjson::JSONValueType::STRING);
+  EXPECT_EQ(valueA.getType(), libjson::JSONValueType::STRING);
   EXPECT_EQ(std::any_cast<std::string>(valueA.value), "first");
   EXPECT_EQ(valueA.get<std::string>(), "first");
 
   libjson::JSONValue valueB = result.getValue("b");
-  EXPECT_EQ(valueB.type, libjson::JSONValueType::STRING);
+  EXPECT_EQ(valueB.getType(), libjson::JSONValueType::STRING);
   EXPECT_EQ(std::any_cast<std::string>(valueB.value), "second");
   EXPECT_EQ(valueB.get<std::string>(), "second");
   EXPECT_EQ(result.get<std::string>("b"), "second");
@@ -49,7 +49,7 @@ TEST(Parser, parses_object_with_object) {
 
   libjson::JSONValue branchValue = root.getValue("branch");
   std::string branchstr = branchValue.get<std::string>();
-  EXPECT_EQ(branchValue.type, libjson::JSONValueType::STRING);
+  EXPECT_EQ(branchValue.getType(), libjson::JSONValueType::STRING);
   EXPECT_EQ(branchstr, "deep value");
 }
 
@@ -58,7 +58,7 @@ TEST(Parser, parses_array_with_values) {
   std::vector<double> expected_arr = {1, 2, 3};
   libjson::JSONValue value = libjson::parse(input);
 
-  ASSERT_EQ(value.type, libjson::JSONValueType::ARRAY);
+  ASSERT_EQ(value.getType(), libjson::JSONValueType::ARRAY);
   libjson::JSONArray array = value.get<libjson::JSONArray>();
   ASSERT_EQ(array.size(), expected_arr.size());
 
@@ -92,5 +92,5 @@ TEST(Parser, objects_with_trailing_comma) {
     "created_at": "2015-01-01T15:00:00Z",
 })";
   libjson::JSONValue value = libjson::parse(json);
-  EXPECT_EQ(value.type, libjson::JSONValueType::OBJECT);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::OBJECT);
 }

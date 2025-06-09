@@ -26,7 +26,17 @@ struct JSONValue {
     }
     return std::any_cast<T>(value);
   }
-  bool is(JSONValueType lhs) { return type == lhs; }
+
+  template <typename T>
+    requires std::integral<T> || std::floating_point<T>
+  const T &get() const {
+    if (type == JSONValueType::NUMBER) {
+      return std::any_cast<JSONNumber>(value).get<T>();
+    }
+    return std::any_cast<T>(value);
+  }
+  const bool is(JSONValueType lhs) const { return type == lhs; }
+  const JSONValueType getType() const { return type; }
 
   JSONValueType type;
   std::any value;

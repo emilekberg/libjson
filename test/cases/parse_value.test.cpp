@@ -9,7 +9,7 @@ TEST(parse, value_string) {
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.type, libjson::JSONValueType::STRING);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::STRING);
   EXPECT_EQ(value.get<std::string>(), "someString");
 }
 
@@ -19,7 +19,7 @@ TEST(parse, value_double) {
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.type, libjson::JSONValueType::NUMBER);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::NUMBER);
   EXPECT_EQ(value.get<double>(), 1234.56);
 }
 
@@ -29,7 +29,7 @@ TEST(parse, value_literal_true) {
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.type, libjson::JSONValueType::BOOL);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::BOOL);
   EXPECT_TRUE(value.get<bool>());
 }
 
@@ -39,7 +39,7 @@ TEST(parse, value_literal_false) {
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.type, libjson::JSONValueType::BOOL);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::BOOL);
   EXPECT_FALSE(value.get<bool>());
 }
 
@@ -49,7 +49,7 @@ TEST(parse, value_literal_null) {
   libjson::Token token = tokens.next();
   libjson::JSONValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.type, libjson::JSONValueType::_NULL);
+  EXPECT_EQ(value.getType(), libjson::JSONValueType::_NULL);
   // EXPECT_EQ(value.get<int>(), nullptr);
 }
 
@@ -57,16 +57,16 @@ TEST(Parse, object_empty_object) {
   std::string input = R"({})";
 
   libjson::JSONValue value = libjson::parse(input);
-  ASSERT_EQ(value.type, libjson::JSONValueType::OBJECT);
+  ASSERT_EQ(value.getType(), libjson::JSONValueType::OBJECT);
 
   libjson::JSONObject object = value.get<libjson::JSONObject>();
-  ASSERT_EQ(object.getKeys().size(), 0);
+  ASSERT_EQ(object.keys().size(), 0);
 }
 
 TEST(parse, array_empty_array) {
   std::string input = R"([])";
   libjson::JSONValue value = libjson::parse(input);
-  ASSERT_EQ(value.type, libjson::JSONValueType::ARRAY);
+  ASSERT_EQ(value.getType(), libjson::JSONValueType::ARRAY);
 
   libjson::JSONArray array = value.get<libjson::JSONArray>();
   ASSERT_EQ(array.size(), 0);

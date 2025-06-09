@@ -9,7 +9,7 @@ class JSONNumber {
 public:
   JSONNumber(const std::string &literal) : _literal(literal) {}
 
-  template <typename T> T get() {
+  template <typename T> const T get() const {
     static_assert(std::is_arithmetic_v<T>, "T must be an arithmetic type");
     T value;
     auto result = std::from_chars(_literal.data(),

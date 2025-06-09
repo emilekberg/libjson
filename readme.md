@@ -45,6 +45,14 @@ build `release` like above, then
 ./build/Debug/benchmark/libjson_bench
 ```
 
+```
+------------------------------------------------------------------------
+Benchmark                              Time             CPU   Iterations
+------------------------------------------------------------------------
+MB_Lexer_data/large-file.json   17420912 ns     17435607 ns           40
+MB_Parse_data/large-file.json  395765344 ns    396697924 ns            2
+```
+
 ## Todo
 
 - [/] https://github.com/briandfoy/json-acceptance-tests/tree/master
