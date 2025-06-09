@@ -1,6 +1,5 @@
 #pragma once
 #include "token.h"
-#include <array>
 #include <string_view>
 
 namespace libjson {

@@ -4,14 +4,12 @@
 #include "json-number.h"
 #include "json-object.h"
 #include "json-value.h"
-#include "lexer.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
 #include <format>
 #include <stdexcept>
 #include <string_view>
-#include <vector>
 namespace libjson {
 JSONValue parse(const std::string_view &input) {
   LazyTokenizer tokens(input);
