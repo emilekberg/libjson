@@ -6,10 +6,10 @@
 #include <string_view>
 namespace libjson {
 
-JSONValue parse(const std::string_view &input);
-JSONObject parseObject(LazyTokenizer &tokens);
-JSONValue parseValue(const Token &token, LazyTokenizer &tokens);
-JSONValue parseNumber(const Token &token);
-JSONValue parseLiteral(const Token &token);
-JSONArray parseArray(LazyTokenizer &tokens);
+JsonValue parse(const std::string_view &input);
+JsonObject parseObject(LazyTokenizer &tokens);
+JsonValue parseValue(const Token &token, LazyTokenizer &tokens);
+JsonValue parseNumber(const Token &token);
+JsonValue parseLiteral(const Token &token);
+JsonArray parseArray(LazyTokenizer &tokens);
 } // namespace libjson

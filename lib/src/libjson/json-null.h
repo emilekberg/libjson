@@ -1,5 +1,5 @@
 #pragma once
 
 namespace libjson {
-struct JSONNull {};
+struct JsonNull {};
 } // namespace libjson

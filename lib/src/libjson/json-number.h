@@ -5,9 +5,9 @@
 #include <string>
 
 namespace libjson {
-class JSONNumber {
+class JsonNumber {
 public:
-  JSONNumber(const std::string &literal) : _literal(literal) {}
+  JsonNumber(const std::string &literal) : _literal(literal) {}
 
   template <concepts::Numeric T> T get() const {
     T value;

@@ -4,31 +4,31 @@
 
 namespace libjson {
 
-std::vector<std::string> &JSONObject::keys() { return _keys; }
+std::vector<std::string> &JsonObject::keys() { return _keys; }
 
-void JSONObject::add(const std::string &key, JSONValue value) {
+void JsonObject::add(const std::string &key, JsonValue value) {
   _data.emplace(key, value);
   _keys.emplace_back(key);
 }
 
-bool JSONObject::has(const std::string &key) const {
+bool JsonObject::has(const std::string &key) const {
   const auto &value = _data.find(key);
   return value != _data.end();
 }
-JSONValue &JSONObject::getValue(const std::string &key) {
+JsonValue &JsonObject::getValue(const std::string &key) {
   auto value = _data.find(key);
   if (value == _data.end()) {
     throw std::invalid_argument(
-        std::format("JSONObject: does not contain object with key: {}", key));
+        std::format("JsonObject: does not contain object with key: {}", key));
   }
   return value->second;
 }
 
-const JSONValue &JSONObject::getValue(const std::string &key) const {
+const JsonValue &JsonObject::getValue(const std::string &key) const {
   const auto &value = _data.find(key);
   if (value == _data.end()) {
     throw std::invalid_argument(
-        std::format("JSONObject: does not contain object with key: {}", key));
+        std::format("JsonObject: does not contain object with key: {}", key));
   }
   return value->second;
 }

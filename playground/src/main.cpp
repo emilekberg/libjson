@@ -18,6 +18,6 @@ int main() {
   //      "created_at": "2015-01-01T15:00:00Z",
   //  })";
   libjson::parse(json);
-  // auto val = result.get<libjson::JSONObject>();
+  // auto val = result.get<libjson::JsonObject>();
   return 0;
 }

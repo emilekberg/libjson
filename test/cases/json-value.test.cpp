@@ -4,44 +4,44 @@
 #include <string>
 using namespace libjson;
 
-TEST(JSONValue, typeid_is_correct) {
-  JSONValue value = {JSONValueType::STRING, std::string("some string")};
+TEST(JsonValue, typeid_is_correct) {
+  JsonValue value = {JsonValueType::STRING, std::string("some string")};
   EXPECT_EQ(value.value.type(), typeid(std::string));
 }
 
-TEST(JSONValue, bool) {
-  JSONValue value = {JSONValueType::BOOL, true};
-  EXPECT_FALSE(value.is(JSONValueType::STRING));
-  EXPECT_TRUE(value.is(JSONValueType::BOOL));
+TEST(JsonValue, bool) {
+  JsonValue value = {JsonValueType::BOOL, true};
+  EXPECT_FALSE(value.is(JsonValueType::STRING));
+  EXPECT_TRUE(value.is(JsonValueType::BOOL));
 }
 
-TEST(JSONValue, is_type) {
-  JSONValue value = {JSONValueType::STRING, std::string("some string")};
-  EXPECT_TRUE(value.is(JSONValueType::STRING));
-  EXPECT_FALSE(value.is(JSONValueType::BOOL));
+TEST(JsonValue, is_type) {
+  JsonValue value = {JsonValueType::STRING, std::string("some string")};
+  EXPECT_TRUE(value.is(JsonValueType::STRING));
+  EXPECT_FALSE(value.is(JsonValueType::BOOL));
 }
 
-TEST(JSONValue, get) {
-  JSONValue value = {JSONValueType::STRING, std::string("some string")};
+TEST(JsonValue, get) {
+  JsonValue value = {JsonValueType::STRING, std::string("some string")};
   EXPECT_EQ(value.get<std::string>(), "some string");
 }
 
-TEST(JSONValue, get_const_str) {
-  const JSONValue value = {JSONValueType::STRING, std::string("some string")};
+TEST(JsonValue, get_const_str) {
+  const JsonValue value = {JsonValueType::STRING, std::string("some string")};
   EXPECT_EQ(value.get<std::string>(), "some string");
 }
 
-TEST(JSONValue, get_const) {
-  const JSONValue value = {JSONValueType::BOOL, false};
+TEST(JsonValue, get_const) {
+  const JsonValue value = {JsonValueType::BOOL, false};
   EXPECT_FALSE(value.get<bool>());
 }
 
-TEST(JSONValue, get_bool) {
-  JSONValue value = {JSONValueType::BOOL, true};
+TEST(JsonValue, get_bool) {
+  JsonValue value = {JsonValueType::BOOL, true};
   EXPECT_TRUE(value.get<bool>());
 }
 
-TEST(JSONValue, get_const_bool) {
-  const JSONValue value = {JSONValueType::STRING, true};
+TEST(JsonValue, get_const_bool) {
+  const JsonValue value = {JsonValueType::STRING, true};
   EXPECT_TRUE(value.get<bool>());
 }

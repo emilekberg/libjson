@@ -10,7 +10,7 @@ TEST(parse, array_of_numbers) {
   std::vector<double> expected_arr = {1, 2, 4, 8, 16, 32, 64};
   libjson::LazyTokenizer tokens(input);
   tokens.next();
-  libjson::JSONArray array = libjson::parseArray(tokens);
+  libjson::JsonArray array = libjson::parseArray(tokens);
 
   ASSERT_EQ(array.size(), expected_arr.size());
 

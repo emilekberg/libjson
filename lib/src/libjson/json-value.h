@@ -3,7 +3,7 @@
 #include "json-number.h"
 #include <any>
 namespace libjson {
-enum class JSONValueType {
+enum class JsonValueType {
   __ERROR__,
   STRING,
   NUMBER,
@@ -12,7 +12,7 @@ enum class JSONValueType {
   BOOL,
   _NULL,
 };
-struct JSONValue {
+struct JsonValue {
 
   template <typename T> T get() { return std::any_cast<T>(value); }
 
@@ -22,33 +22,33 @@ struct JSONValue {
   }
 
   template <concepts::Numeric T> T get() {
-    if (type == JSONValueType::NUMBER) {
-      // return static_cast<JSONNumber>(_value).get<T>();
-      return std::any_cast<JSONNumber>(value).get<T>();
+    if (type == JsonValueType::NUMBER) {
+      // return static_cast<JsonNumber>(_value).get<T>();
+      return std::any_cast<JsonNumber>(value).get<T>();
     }
     // return static_cast<T>(_value);
     return std::any_cast<T>(value);
   }
 
   template <concepts::Numeric T> T get() const {
-    if (type == JSONValueType::NUMBER) {
-      // return static_cast<JSONNumber>(_value).get<T>();
-      return std::any_cast<JSONNumber>(value).get<T>();
+    if (type == JsonValueType::NUMBER) {
+      // return static_cast<JsonNumber>(_value).get<T>();
+      return std::any_cast<JsonNumber>(value).get<T>();
     }
     // return static_cast<T>(_value);
     return std::any_cast<T>(value);
   }
-  const bool is(JSONValueType lhs) const { return type == lhs; }
-  const JSONValueType getType() const { return type; }
+  const bool is(JsonValueType lhs) const { return type == lhs; }
+  const JsonValueType getType() const { return type; }
 
-  JSONValueType type;
+  JsonValueType type;
   std::any value;
 
-  // std::variant<JSONObject, JSONArray, JSONNumber, JSONNull, std::string>
+  // std::variant<JsonObject, JsonArray, JsonNumber, JsonNull, std::string>
   // _value;
 };
 
-template <> inline bool JSONValue::get<bool>() {
+template <> inline bool JsonValue::get<bool>() {
   return std::any_cast<bool>(value);
 }
 
