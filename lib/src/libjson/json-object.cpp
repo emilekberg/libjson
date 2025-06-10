@@ -11,7 +11,7 @@ void JSONObject::add(const std::string &key, JSONValue value) {
   _keys.emplace_back(key);
 }
 
-const bool JSONObject::has(const std::string &key) const {
+bool JSONObject::has(const std::string &key) const {
   const auto &value = _data.find(key);
   return value != _data.end();
 }

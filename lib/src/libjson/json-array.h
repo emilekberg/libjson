@@ -12,6 +12,9 @@ public:
 
   JSONValue &at(size_t index) { return _data[index]; }
   template <typename T> T &at(size_t index) { return _data[index].get<T>(); }
+  template <typename T> T &at(size_t index) const {
+    return _data[index].get<T>();
+  }
 
   size_t size() { return _data.size(); }
 

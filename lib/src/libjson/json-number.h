@@ -1,16 +1,15 @@
 #pragma once
+#include "concepts.h"
 #include <charconv>
 #include <stdexcept>
 #include <string>
-#include <type_traits>
 
 namespace libjson {
 class JSONNumber {
 public:
   JSONNumber(const std::string &literal) : _literal(literal) {}
 
-  template <typename T> const T get() const {
-    static_assert(std::is_arithmetic_v<T>, "T must be an arithmetic type");
+  template <concepts::Numeric T> T get() const {
     T value;
     auto result = std::from_chars(_literal.data(),
                                   _literal.data() + _literal.size(), value);

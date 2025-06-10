@@ -53,3 +53,11 @@ TEST(JSONObject, const_cast_get) {
   const JSONObject constObj = obj;
   EXPECT_EQ(constObj.get<std::string>("key"), "value");
 }
+
+TEST(JSONObject, const_number_test) {
+  JSONObject obj;
+  obj.add("number", 1337);
+  EXPECT_TRUE(obj.has("number"));
+  const JSONObject constObj = obj;
+  EXPECT_EQ(constObj.get<int>("number"), 1337);
+}
