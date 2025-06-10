@@ -49,7 +49,7 @@ TEST(parse, value_literal_null) {
   libjson::Token token = tokens.next();
   libjson::JsonValue value = libjson::parseValue(token, tokens);
 
-  EXPECT_EQ(value.getType(), libjson::JsonValueType::_NULL);
+  EXPECT_EQ(value.getType(), libjson::JsonValueType::_NULL_);
   // EXPECT_EQ(value.get<int>(), nullptr);
 }
 

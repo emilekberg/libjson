@@ -2,6 +2,7 @@
 #include "concepts.h"
 #include "json-null.h"
 #include "json-number.h"
+#include "json-value-types.h"
 #include "json-value.h"
 #include <string>
 #include <unordered_map>
@@ -34,7 +35,7 @@ public:
     } else if constexpr (std::is_same_v<T, JsonObject>) {
       add(key, {JsonValueType::OBJECT, value});
     } else if constexpr (std::is_same_v<T, JsonNull>) {
-      add(key, {JsonValueType::_NULL, value});
+      add(key, {JsonValueType::_NULL_, value});
     }
   }
 

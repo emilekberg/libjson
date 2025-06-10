@@ -1,17 +1,9 @@
 #pragma once
 #include "concepts.h"
 #include "json-number.h"
+#include "json-value-types.h"
 #include <any>
 namespace libjson {
-enum class JsonValueType {
-  __ERROR__,
-  STRING,
-  NUMBER,
-  OBJECT,
-  ARRAY,
-  BOOL,
-  _NULL,
-};
 struct JsonValue {
 
   template <typename T> T get() { return std::any_cast<T>(value); }
@@ -22,12 +14,12 @@ struct JsonValue {
   }
 
   template <concepts::Numeric T> T get() {
-    if (type == JsonValueType::NUMBER) {
-      // return static_cast<JsonNumber>(_value).get<T>();
-      return std::any_cast<JsonNumber>(value).get<T>();
-    }
+    // if (type == JsonValueType::NUMBER) {
+    // return static_cast<JsonNumber>(_value).get<T>();
+    return std::any_cast<JsonNumber>(value).get<T>();
+    // }
     // return static_cast<T>(_value);
-    return std::any_cast<T>(value);
+    // return std::any_cast<T>(value);
   }
 
   template <concepts::Numeric T> T get() const {

@@ -3,6 +3,7 @@
 #include "json-null.h"
 #include "json-number.h"
 #include "json-object.h"
+#include "json-value-types.h"
 #include "json-value.h"
 #include "token.h"
 #include "token_types.h"
@@ -112,7 +113,7 @@ JsonValue parseLiteral(const Token &token) {
   case 'f':
     return {JsonValueType::BOOL, false};
   case 'n':
-    return {JsonValueType::_NULL, JsonNull{}};
+    return {JsonValueType::_NULL_, JsonNull{}};
   }
   throw std::runtime_error("should never come here");
 }
