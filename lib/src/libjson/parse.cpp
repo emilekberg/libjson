@@ -31,10 +31,10 @@ JsonValue parse(const std::string_view &input) {
 }
 
 JsonObject parseObject(LazyTokenizer &tokens) {
-  JsonObject result;
+  std::unordered_map<std::string, JsonValue> data;
   if (tokens.peek() == Token_CloseBracer) {
     tokens.next();
-    return result;
+    return {data};
   }
   while (true) {
     Token tKey = tokens.next();
@@ -48,9 +48,7 @@ JsonObject parseObject(LazyTokenizer &tokens) {
           "expected {}, but got {}", Token_Colon.literal, tColon.literal));
     }
 
-    Token tValue = tokens.next();
-    JsonValue value = parseValue(tValue, tokens);
-    result.add(std::string(tKey.literal), value);
+    data.emplace(std::string(tKey.literal), parseValue(tokens.next(), tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracer) {
@@ -68,29 +66,27 @@ JsonObject parseObject(LazyTokenizer &tokens) {
           Token_Comma.literal, Token_CloseBracer.literal, tEnd.literal));
     }
   }
-  return result;
+  return {data};
 }
 
 JsonArray parseArray(LazyTokenizer &tokens) {
-  JsonArray result;
+  std::vector<JsonValue> data;
   if (tokens.peek() == Token_CloseBracket) {
     tokens.next();
-    return result;
+    return {data};
   }
 
   while (true) {
-    Token token = tokens.next();
-    JsonValue value = parseValue(token, tokens);
-    result.add(value);
+    data.emplace_back(parseValue(tokens.next(), tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracket) {
-      return result;
+      return {data};
     }
     if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
       // support trailing comma
       tokens.next();
-      return result;
+      return {data};
     }
     if (tEnd != Token_Comma) {
       throw std::invalid_argument(std::format(
@@ -98,8 +94,7 @@ JsonArray parseArray(LazyTokenizer &tokens) {
           Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
     }
   }
-
-  return result;
+  return {data};
 }
 
 JsonValue parseNumber(const Token &token) {

@@ -4,6 +4,9 @@
 namespace libjson {
 class JsonArray {
 public:
+  JsonArray() = default;
+  JsonArray(std::vector<JsonValue> data) : _data(data) {};
+
   void add(JsonValue &value) { _data.emplace_back(value); }
   std::vector<JsonValue>::iterator begin() { return _data.begin(); }
   std::vector<JsonValue>::iterator end() { return _data.end(); }

@@ -6,11 +6,6 @@ namespace libjson {
 
 std::vector<std::string> &JsonObject::keys() { return _keys; }
 
-void JsonObject::add(const std::string &key, JsonValue value) {
-  _data.emplace(key, value);
-  _keys.emplace_back(key);
-}
-
 bool JsonObject::has(const std::string &key) const {
   const auto &value = _data.find(key);
   return value != _data.end();
