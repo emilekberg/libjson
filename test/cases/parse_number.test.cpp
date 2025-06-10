@@ -1,6 +1,4 @@
-#include "libjson/json-number.h"
 #include <gtest/gtest.h>
-#include <libjson/json-value.h>
 #include <libjson/parse.h>
 
 TEST(parse, number_int) {

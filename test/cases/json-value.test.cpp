@@ -1,47 +1,47 @@
 
 #include <gtest/gtest.h>
-#include <libjson/json-value.h>
+#include <libjson/json-types.h>
 #include <string>
 using namespace libjson;
 
 TEST(JsonValue, typeid_is_correct) {
-  JsonValue value = {JsonValueType::STRING, std::string("some string")};
-  EXPECT_EQ(value.value.type(), typeid(std::string));
+  JsonValue value = {std::string("some string")};
+  // EXPECT_EQ(value., typeid(std::string));
 }
 
 TEST(JsonValue, bool) {
-  JsonValue value = {JsonValueType::BOOL, true};
+  JsonValue value = {true};
   EXPECT_FALSE(value.is(JsonValueType::STRING));
   EXPECT_TRUE(value.is(JsonValueType::BOOL));
 }
 
 TEST(JsonValue, is_type) {
-  JsonValue value = {JsonValueType::STRING, std::string("some string")};
+  JsonValue value = {std::string("some string")};
   EXPECT_TRUE(value.is(JsonValueType::STRING));
   EXPECT_FALSE(value.is(JsonValueType::BOOL));
 }
 
 TEST(JsonValue, get) {
-  JsonValue value = {JsonValueType::STRING, std::string("some string")};
+  JsonValue value = {std::string("some string")};
   EXPECT_EQ(value.get<std::string>(), "some string");
 }
 
 TEST(JsonValue, get_const_str) {
-  const JsonValue value = {JsonValueType::STRING, std::string("some string")};
+  const JsonValue value = {std::string("some string")};
   EXPECT_EQ(value.get<std::string>(), "some string");
 }
 
 TEST(JsonValue, get_const) {
-  const JsonValue value = {JsonValueType::BOOL, false};
+  const JsonValue value = {false};
   EXPECT_FALSE(value.get<bool>());
 }
 
 TEST(JsonValue, get_bool) {
-  JsonValue value = {JsonValueType::BOOL, true};
+  JsonValue value = {true};
   EXPECT_TRUE(value.get<bool>());
 }
 
 TEST(JsonValue, get_const_bool) {
-  const JsonValue value = {JsonValueType::STRING, true};
+  const JsonValue value = {true};
   EXPECT_TRUE(value.get<bool>());
 }

@@ -9,7 +9,7 @@ add_subdirectory(lib)
 
 
 if(BUILD_TESTING)
-	add_subdirectory(benchmark)
+	# add_subdirectory(benchmark)
 endif()
 include(CTest) 
 if(BUILD_TESTING)

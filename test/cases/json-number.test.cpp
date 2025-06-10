@@ -1,6 +1,5 @@
-#include "libjson/json-number.h"
 #include <gtest/gtest.h>
-#include <libjson/json-null.h>
+#include <libjson/json-types.h>
 
 using namespace libjson;
 
