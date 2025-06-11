@@ -49,8 +49,8 @@ build `release` like above, then
 ------------------------------------------------------------------------
 Benchmark                              Time             CPU   Iterations
 ------------------------------------------------------------------------
-MB_Lexer_data/large-file.json   17420912 ns     17435607 ns           40
-MB_Parse_data/large-file.json  395765344 ns    396697924 ns            2
+MB_Lexer_data/large-file.json   18238794 ns     17423223 ns           40
+MB_Parse_data/large-file.json  134794042 ns    128762562 ns            4
 ```
 
 ## Todo

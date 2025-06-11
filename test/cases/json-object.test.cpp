@@ -1,6 +1,6 @@
-#include "libjson/json-value.h"
+#include "libjson/json-types.h"
+#include "libjson/json-value-types.h"
 #include <gtest/gtest.h>
-#include <libjson/json-object.h>
 
 using namespace libjson;
 TEST(JsonObject, has_returns_false) {
@@ -9,55 +9,60 @@ TEST(JsonObject, has_returns_false) {
 }
 
 TEST(JsonObject, can_add_values) {
-  JsonObject obj;
-  obj.add("key", {JsonValueType::STRING, std::string("value")});
+  JsonObject obj({{"key", {std::string("value")}}});
   EXPECT_TRUE(obj.has("key"));
 }
 
 TEST(JsonObject, can_add_T_string) {
-  JsonObject obj;
   const std::string constString = "anotherString";
-  obj.add("key", std::string("value"));
-  obj.add("keyForConst", constString);
+  JsonObject obj({{"key", std::string("value")}, {"keyForConst", constString}});
   EXPECT_TRUE(obj.has("key"));
-  EXPECT_EQ(obj.getValue("key").getType(), JsonValueType::STRING);
+  EXPECT_EQ(obj.get<JsonValue>("key").getType(), JsonValueType::STRING);
   EXPECT_TRUE(obj.has("keyForConst"));
-  EXPECT_EQ(obj.getValue("keyForConst").getType(), JsonValueType::STRING);
+  EXPECT_EQ(obj.get<JsonValue>("keyForConst").getType(), JsonValueType::STRING);
 }
 
 TEST(JsonObject, can_add_T_bool) {
-  JsonObject obj;
-  obj.add("bool", true);
+  JsonObject obj({{"bool", false}});
   EXPECT_TRUE(obj.has("bool"));
-  EXPECT_EQ(obj.getValue("bool").getType(), JsonValueType::BOOL);
-  EXPECT_TRUE(obj.get<bool>("bool"));
+  EXPECT_EQ(obj.get<JsonValue>("bool").getType(), JsonValueType::BOOL);
+  EXPECT_FALSE(obj.get<bool>("bool"));
 }
 
 TEST(JsonObject, can_add_T_number) {
-  JsonObject obj;
-  obj.add("number", 1337);
+  JsonObject obj({{"number", JsonNumber("1337")}});
   EXPECT_TRUE(obj.has("number"));
-  EXPECT_EQ(obj.getValue("number").getType(), JsonValueType::NUMBER);
+  EXPECT_EQ(obj.get<JsonValue>("number").getType(), JsonValueType::NUMBER);
+  EXPECT_EQ(obj.get<int>("number"), 1337);
 }
 
 TEST(JsonObject, const_cast_has) {
-  JsonObject obj;
-  obj.add("key", {JsonValueType::STRING, std::string("value")});
+  JsonObject obj({{"key", std::string("value")}});
   const JsonObject constObj = obj;
   EXPECT_TRUE(constObj.has("key"));
+  EXPECT_EQ(constObj.get<JsonValue>("key").getType(), JsonValueType::STRING);
 }
 
 TEST(JsonObject, const_cast_get) {
-  JsonObject obj;
-  obj.add("key", {JsonValueType::STRING, std::string("value")});
+  JsonObject obj({{"key", std::string("value")}});
   const JsonObject constObj = obj;
-  EXPECT_EQ(constObj.get<std::string>("key"), "value");
+  EXPECT_EQ(constObj.get<JsonString>("key"), "value");
 }
 
 TEST(JsonObject, const_number_test) {
-  JsonObject obj;
-  obj.add("number", 1337);
+  JsonObject obj({{"number", JsonNumber("1337")}});
   EXPECT_TRUE(obj.has("number"));
   const JsonObject constObj = obj;
   EXPECT_EQ(constObj.get<int>("number"), 1337);
+}
+
+TEST(JsonObject, iterator) {
+  JsonObject obj(
+      {{"a", JsonNumber("1")}, {"b", JsonNumber("2")}, {"c", JsonNumber("3")}});
+
+  EXPECT_EQ(obj.size(), 3);
+  size_t i = 0;
+  for (auto v : obj) {
+    EXPECT_GT(v.second.get<int>(), 0);
+  }
 }

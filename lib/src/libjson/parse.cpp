@@ -1,10 +1,5 @@
 #include "parse.h"
-#include "json-array.h"
-#include "json-null.h"
-#include "json-number.h"
-#include "json-object.h"
-#include "json-value-types.h"
-#include "json-value.h"
+#include "json-types.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
@@ -12,6 +7,7 @@
 #include <stdexcept>
 #include <string_view>
 namespace libjson {
+
 JsonValue parse(const std::string_view &input) {
   LazyTokenizer tokens(input);
   Token token = tokens.next();
@@ -21,21 +17,23 @@ JsonValue parse(const std::string_view &input) {
                     Token_OpenBracer.literal, token.literal);
     throw std::invalid_argument(err);
   }
+
   JsonValue result = parseValue(token, tokens);
   if (tokens.peek() != Token_EndOfFile) {
     throw std::invalid_argument(std::format(
-        "Unexpected Token after parsing data. Expected {} but got {}",
-        Token_EndOfFile.literal, tokens.peek().literal));
+        "Unexpected Token after parsing data. Expected EOF but got {}",
+        tokens.peek().literal));
   }
   return result;
 }
 
 JsonObject parseObject(LazyTokenizer &tokens) {
-  JsonObject result;
+  JsonObjectData data;
   if (tokens.peek() == Token_CloseBracer) {
     tokens.next();
-    return result;
+    return {data};
   }
+
   while (true) {
     Token tKey = tokens.next();
     if (tKey.type != TokenTypes::STRING) {
@@ -48,9 +46,7 @@ JsonObject parseObject(LazyTokenizer &tokens) {
           "expected {}, but got {}", Token_Colon.literal, tColon.literal));
     }
 
-    Token tValue = tokens.next();
-    JsonValue value = parseValue(tValue, tokens);
-    result.add(std::string(tKey.literal), value);
+    data.emplace(std::string(tKey.literal), parseValue(tokens.next(), tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracer) {
@@ -68,29 +64,27 @@ JsonObject parseObject(LazyTokenizer &tokens) {
           Token_Comma.literal, Token_CloseBracer.literal, tEnd.literal));
     }
   }
-  return result;
+  return {data};
 }
 
 JsonArray parseArray(LazyTokenizer &tokens) {
-  JsonArray result;
+  JsonArrayData data;
   if (tokens.peek() == Token_CloseBracket) {
     tokens.next();
-    return result;
+    return {data};
   }
 
   while (true) {
-    Token token = tokens.next();
-    JsonValue value = parseValue(token, tokens);
-    result.add(value);
+    data.emplace_back(parseValue(tokens.next(), tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracket) {
-      return result;
+      return {data};
     }
     if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
       // support trailing comma
       tokens.next();
-      return result;
+      return {data};
     }
     if (tEnd != Token_Comma) {
       throw std::invalid_argument(std::format(
@@ -98,22 +92,21 @@ JsonArray parseArray(LazyTokenizer &tokens) {
           Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
     }
   }
-
-  return result;
+  return {data};
 }
 
 JsonValue parseNumber(const Token &token) {
-  return {JsonValueType::NUMBER, JsonNumber(std::string(token.literal))};
+  return {JsonNumber(std::string(token.literal))};
 }
 
 JsonValue parseLiteral(const Token &token) {
   switch (token.literal[0]) {
   case 't':
-    return {JsonValueType::BOOL, true};
+    return {true};
   case 'f':
-    return {JsonValueType::BOOL, false};
+    return {false};
   case 'n':
-    return {JsonValueType::_NULL_, JsonNull{}};
+    return {nullptr};
   }
   throw std::runtime_error("should never come here");
 }
@@ -121,7 +114,7 @@ JsonValue parseLiteral(const Token &token) {
 JsonValue parseValue(const Token &token, LazyTokenizer &tokens) {
   switch (token.type) {
   case TokenTypes::STRING:
-    return {JsonValueType::STRING, std::string(token.literal)};
+    return {std::string(token.literal)};
 
   case TokenTypes::NUMBER:
     return parseNumber(token);
@@ -131,9 +124,9 @@ JsonValue parseValue(const Token &token, LazyTokenizer &tokens) {
 
   case TokenTypes::SEPARATOR:
     if (token == Token_OpenBracer) {
-      return {JsonValueType::OBJECT, parseObject(tokens)};
+      return {parseObject(tokens)};
     } else if (token == Token_OpenBracket) {
-      return {JsonValueType::ARRAY, parseArray(tokens)};
+      return {parseArray(tokens)};
     }
     throw std::invalid_argument(std::format(
         "ParseJsonValue: Unexpected separator: {}.", token.literal));

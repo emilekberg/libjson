@@ -1,6 +1,5 @@
 #pragma once
-#include "json-array.h"
-#include "json-object.h"
+#include "json-types.h"
 #include "token.h"
 #include "tokenizer.h"
 #include <string_view>

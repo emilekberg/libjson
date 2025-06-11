@@ -1,5 +1,4 @@
-#include "libjson/json-object.h"
-#include "libjson/json-value.h"
+#include "libjson/json-types.h"
 #include <gtest/gtest.h>
 #include <libjson/parse.h>
 
@@ -50,7 +49,7 @@ TEST(parse, value_literal_null) {
   libjson::JsonValue value = libjson::parseValue(token, tokens);
 
   EXPECT_EQ(value.getType(), libjson::JsonValueType::_NULL_);
-  // EXPECT_EQ(value.get<int>(), nullptr);
+  EXPECT_EQ(value.get<libjson::JsonNull>(), nullptr);
 }
 
 TEST(Parse, object_empty_object) {
@@ -60,7 +59,7 @@ TEST(Parse, object_empty_object) {
   ASSERT_EQ(value.getType(), libjson::JsonValueType::OBJECT);
 
   libjson::JsonObject object = value.get<libjson::JsonObject>();
-  ASSERT_EQ(object.keys().size(), 0);
+  ASSERT_EQ(object.size(), 0);
 }
 
 TEST(parse, array_empty_array) {

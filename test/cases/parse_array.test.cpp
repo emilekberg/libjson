@@ -1,4 +1,3 @@
-#include "libjson/json-array.h"
 #include "libjson/tokenizer.h"
 #include <gtest/gtest.h>
 #include <libjson/parse.h>
