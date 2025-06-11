@@ -183,8 +183,8 @@ public:
 
   auto begin() { return _data.begin(); }
   auto end() { return _data.end(); }
-  auto cbegin() { return _data.cbegin(); }
-  auto cend() { return _data.cend(); }
+  const auto cbegin() const { return _data.cbegin(); }
+  const auto cend() const { return _data.cend(); }
   size_t size() { return _data.size(); }
   JsonValue operator[](size_t offset) const { return _data[offset]; }
 
@@ -215,8 +215,8 @@ public:
 
   auto begin() { return _data.begin(); }
   auto end() { return _data.end(); }
-  auto cbegin() { return _data.cbegin(); }
-  auto cend() { return _data.cend(); }
+  const auto cbegin() const { return _data.cbegin(); }
+  const auto cend() const { return _data.cend(); }
   size_t size() { return _data.size(); }
   JsonValue operator[](const std::string &key) { return _data[key]; }
 
