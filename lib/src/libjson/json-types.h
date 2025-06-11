@@ -143,6 +143,24 @@ public:
         "JsonValue::get<NonNumeric> variant not satisfied.");
   }
 
+  template <libjson::concepts::NonNumeric T> T &get() {
+    if constexpr (std::is_same_v<T, JsonArray>) {
+      if (auto p = std::get_if<std::shared_ptr<JsonArray>>(&_value)) {
+        return **p;
+      }
+    } else if constexpr (std::is_same_v<T, JsonObject>) {
+      if (auto p = std::get_if<std::shared_ptr<JsonObject>>(&_value)) {
+        return **p;
+      }
+    } else {
+      if (auto p = std::get_if<T>(&_value)) {
+        return *p;
+      }
+    }
+    throw std::invalid_argument(
+        "JsonValue::get<NonNumeric> variant not satisfied.");
+  }
+
 private:
   JsonValueVariantType _value;
   JsonValueType _type;
@@ -178,6 +196,10 @@ public:
     return _data.at(index).get<T>();
   }
 
+  template <libjson::concepts::NonNumeric T> T &get(size_t index) {
+    return _data.at(index).get<T>();
+  }
+
 private:
   JsonArrayData _data;
 };
@@ -204,6 +226,15 @@ public:
 
   template <libjson::concepts::NonNumeric T>
   const T get(const std::string &key) const {
+    if constexpr (std::is_same_v<T, JsonValue>) {
+      return _data.at(key);
+    } else {
+      return _data.at(key).get<T>();
+    }
+  }
+
+  template <libjson::concepts::NonNumeric T>
+  const T &get(const std::string &key) {
     if constexpr (std::is_same_v<T, JsonValue>) {
       return _data.at(key);
     } else {
