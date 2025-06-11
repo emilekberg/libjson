@@ -13,6 +13,26 @@
 
 namespace libjson {
 
+//--------------------
+// basic types
+// - string
+// - bool
+// - null
+//--------------------
+using JsonString = std::string;
+using JsonBool = bool;
+using JsonNull = std::nullptr_t;
+// forward declare types since we have a recursion going on
+// Objects has values, which can be objects.
+// Arrays has values, which can be arrays.
+class JsonObject;
+class JsonArray;
+
+//--------------------
+// advanced types
+// - number
+// - value (variant of all types)
+//--------------------
 class JsonNumber {
 public:
   JsonNumber(const std::string &literal) : _literal(literal) {}
@@ -30,13 +50,6 @@ public:
 private:
   std::string _literal;
 };
-using JsonBool = bool;
-using JsonString = std::string;
-using JsonNull = std::nullptr_t;
-
-// forward declare
-class JsonObject;
-class JsonArray;
 
 // json value needs to store JsonObject and JsonArray in shared_ptr to know the
 // size of it at compile time.
@@ -135,6 +148,15 @@ private:
   JsonValueType _type;
 };
 
+//--------------------
+// collection types
+// - object
+// - array
+//--------------------
+
+// ---------
+// - array -
+// ---------
 using JsonArrayData = std::vector<JsonValue>;
 class JsonArray {
 public:
@@ -160,6 +182,9 @@ private:
   JsonArrayData _data;
 };
 
+// ----------
+// - object -
+// ----------
 using JsonObjectData = std::unordered_map<std::string, JsonValue>;
 class JsonObject {
 public:
