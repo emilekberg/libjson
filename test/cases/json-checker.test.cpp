@@ -55,7 +55,7 @@ INSTANTIATE_TEST_SUITE_P(
 
         "fail33.json"));
 
-TEST_P(JsonCheckerPassesTests, fails) {
+TEST_P(JsonCheckerPassesTests, passes) {
   EXPECT_FALSE(filecontent.empty());
   EXPECT_NO_THROW(libjson::parse(filecontent));
 }

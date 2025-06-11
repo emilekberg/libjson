@@ -62,9 +62,9 @@ TEST(Parser, parses_array_with_values) {
 
   ASSERT_EQ(value.getType(), libjson::JsonValueType::ARRAY);
   libjson::JsonArray array = value.get<libjson::JsonArray>();
-  ASSERT_EQ(array._data.size(), expected_arr.size());
+  ASSERT_EQ(array.size(), expected_arr.size());
 
-  for (size_t i = 0; i < array._data.size(); i++) {
+  for (size_t i = 0; i < array.size(); i++) {
     int expected = expected_arr[i];
     // int actual = array._data[i].get<libjson::JsonObject>().get<int>("a");
     // EXPECT_EQ(actual, expected);

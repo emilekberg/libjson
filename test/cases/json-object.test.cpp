@@ -19,9 +19,7 @@ TEST(JsonObject, can_add_T_string) {
   EXPECT_TRUE(obj.has("key"));
   EXPECT_EQ(obj.get<JsonValue>("key").getType(), JsonValueType::STRING);
   EXPECT_TRUE(obj.has("keyForConst"));
-  // TODO: Fix this
-  // EXPECT_EQ(obj.get<JsonValue>("keyForConst").getType(),
-  // JsonValueType::STRING);
+  EXPECT_EQ(obj.get<JsonValue>("keyForConst").getType(), JsonValueType::STRING);
 }
 
 TEST(JsonObject, can_add_T_bool) {
@@ -49,7 +47,6 @@ TEST(JsonObject, const_cast_get) {
   JsonObject obj({{"key", std::string("value")}});
   const JsonObject constObj = obj;
   EXPECT_EQ(constObj.get<JsonString>("key"), "value");
-  // TODO: fix this shit
 }
 
 TEST(JsonObject, const_number_test) {
@@ -57,4 +54,15 @@ TEST(JsonObject, const_number_test) {
   EXPECT_TRUE(obj.has("number"));
   const JsonObject constObj = obj;
   EXPECT_EQ(constObj.get<int>("number"), 1337);
+}
+
+TEST(JsonObject, iterator) {
+  JsonObject obj(
+      {{"a", JsonNumber("1")}, {"b", JsonNumber("2")}, {"c", JsonNumber("3")}});
+
+  EXPECT_EQ(obj.size(), 3);
+  size_t i = 0;
+  for (auto v : obj) {
+    EXPECT_GT(v.second.get<int>(), 0);
+  }
 }

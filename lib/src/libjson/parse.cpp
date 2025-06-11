@@ -7,6 +7,7 @@
 #include <stdexcept>
 #include <string_view>
 namespace libjson {
+
 JsonValue parse(const std::string_view &input) {
   LazyTokenizer tokens(input);
   Token token = tokens.next();
@@ -16,11 +17,12 @@ JsonValue parse(const std::string_view &input) {
                     Token_OpenBracer.literal, token.literal);
     throw std::invalid_argument(err);
   }
+
   JsonValue result = parseValue(token, tokens);
   if (tokens.peek() != Token_EndOfFile) {
     throw std::invalid_argument(std::format(
-        "Unexpected Token after parsing data. Expected {} but got {}",
-        Token_EndOfFile.literal, tokens.peek().literal));
+        "Unexpected Token after parsing data. Expected EOF but got {}",
+        tokens.peek().literal));
   }
   return result;
 }
@@ -31,6 +33,7 @@ JsonObject parseObject(LazyTokenizer &tokens) {
     tokens.next();
     return {data};
   }
+
   while (true) {
     Token tKey = tokens.next();
     if (tKey.type != TokenTypes::STRING) {
@@ -102,8 +105,8 @@ JsonValue parseLiteral(const Token &token) {
     return {true};
   case 'f':
     return {false};
-    // case 'n':
-    //   return {nullptr};
+  case 'n':
+    return {nullptr};
   }
   throw std::runtime_error("should never come here");
 }
