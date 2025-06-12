@@ -11,14 +11,14 @@ TEST(JsonValue, typeid_is_correct) {
 
 TEST(JsonValue, bool) {
   JsonValue value = {true};
-  EXPECT_FALSE(value.is(JsonValueType::STRING));
-  EXPECT_TRUE(value.is(JsonValueType::BOOL));
+  EXPECT_FALSE(value.is(ValueType::STRING));
+  EXPECT_TRUE(value.is(ValueType::BOOL));
 }
 
 TEST(JsonValue, is_type) {
   JsonValue value = {std::string("some string")};
-  EXPECT_TRUE(value.is(JsonValueType::STRING));
-  EXPECT_FALSE(value.is(JsonValueType::BOOL));
+  EXPECT_TRUE(value.is(ValueType::STRING));
+  EXPECT_FALSE(value.is(ValueType::BOOL));
 }
 
 TEST(JsonValue, get) {

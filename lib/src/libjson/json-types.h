@@ -1,8 +1,8 @@
 #pragma once
 
 #include "concepts.h"
-#include "json-value-types.h"
 #include <charconv>
+#include <initializer_list>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -13,6 +13,14 @@
 
 namespace libjson {
 
+enum class ValueType {
+  _NULL_,
+  STRING,
+  NUMBER,
+  OBJECT,
+  ARRAY,
+  BOOL,
+};
 //--------------------
 // basic types
 // - string
@@ -60,10 +68,10 @@ public:
                    std::shared_ptr<JsonObject>, JsonNull, JsonString, JsonBool,
                    JsonNumber>;
 
-  JsonValue() = default;
+  JsonValue() noexcept = default;
 
   // copy constructors.
-  JsonValue(const JsonValue &) = default;
+  JsonValue(const JsonValue &) noexcept = default;
   JsonValue(JsonValue &&) noexcept = default;
   JsonValue &operator=(const JsonValue &) = default;
   JsonValue &operator=(JsonValue &&) noexcept = default;
@@ -77,13 +85,13 @@ public:
     // deduce the type from, for instance, const std::string& to just the type.
     using U = std::decay_t<T>;
     if constexpr (std::is_same_v<U, JsonBool>) {
-      _type = JsonValueType::BOOL;
-    } else if constexpr (std::is_same_v<U, JsonString>) {
-      _type = JsonValueType::STRING;
+      _type = ValueType::BOOL;
     } else if constexpr (std::is_same_v<U, JsonNull>) {
-      _type = JsonValueType::_NULL_;
+      _type = ValueType::_NULL_;
     } else if constexpr (std::is_same_v<U, JsonNumber>) {
-      _type = JsonValueType::NUMBER;
+      _type = ValueType::NUMBER;
+    } else if constexpr (std::is_convertible_v<U, JsonString>) {
+      _type = ValueType::STRING;
     } else {
       static_assert(false, "JsonValue: unsupported type");
     }
@@ -93,27 +101,26 @@ public:
   // we have special constructors for them so the user does not need to care
   // about that.
   JsonValue(const JsonArray &array)
-      : _value(std::make_shared<JsonArray>(array)),
-        _type(JsonValueType::ARRAY) {}
+      : _value(std::make_shared<JsonArray>(array)), _type(ValueType::ARRAY) {}
   JsonValue(JsonArray &array)
       : _value(std::make_shared<JsonArray>(std::move(array))),
-        _type(JsonValueType::ARRAY) {}
+        _type(ValueType::ARRAY) {}
   JsonValue(JsonArray &&array)
       : _value(std::make_shared<JsonArray>(std::move(array))),
-        _type(JsonValueType::ARRAY) {}
+        _type(ValueType::ARRAY) {}
 
   JsonValue(const JsonObject &object)
-      : _value(std::make_shared<JsonObject>(object)),
-        _type(JsonValueType::OBJECT) {}
+      : _value(std::make_shared<JsonObject>(object)), _type(ValueType::OBJECT) {
+  }
   JsonValue(JsonObject &object)
       : _value(std::make_shared<JsonObject>(std::move(object))),
-        _type(JsonValueType::OBJECT) {}
+        _type(ValueType::OBJECT) {}
   JsonValue(JsonObject &&object)
       : _value(std::make_shared<JsonObject>(std::move(object))),
-        _type(JsonValueType::OBJECT) {}
+        _type(ValueType::OBJECT) {}
 
-  JsonValueType getType() const { return _type; }
-  bool is(JsonValueType lhs) const { return _type == lhs; }
+  ValueType getType() const { return _type; }
+  bool is(ValueType lhs) const { return _type == lhs; }
 
   template <libjson::concepts::Numeric T> T get() const {
     if (auto p = std::get_if<JsonNumber>(&_value)) {
@@ -163,7 +170,7 @@ public:
 
 private:
   JsonValueVariantType _value;
-  JsonValueType _type;
+  ValueType _type;
 };
 
 //--------------------
@@ -212,6 +219,8 @@ class JsonObject {
 public:
   JsonObject() = default;
   JsonObject(const JsonObjectData &data) : _data(data) {};
+  JsonObject(std::initializer_list<std::pair<std::string, JsonValue>> list)
+      : _data(list.begin(), list.end()) {}
 
   auto begin() { return _data.begin(); }
   auto end() { return _data.end(); }
@@ -242,9 +251,7 @@ public:
     }
   }
 
-  bool has(const std::string &key) const {
-    return _data.find(key) != _data.end();
-  }
+  bool has(const std::string &key) const { return _data.contains(key); }
 
 private:
   JsonObjectData _data;

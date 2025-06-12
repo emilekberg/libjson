@@ -76,9 +76,22 @@ MB_Parse_data/large-file.json  134794042 ns    128762562 ns            4
 
 ## Example
 
+### Construction
+```cpp
+libjson::JsonObject obj({
+  {"name", "emil"},
+  {"age", JsonNumber("12")},
+});
+
+std::cout << "name is: " << obj.get<JsonString>("name") << std::endl;
+std::cout << "age is: " << obj.get<uint16_t>("age") << std::endl;
+```
+
+
+### Parse
 ```cpp
 std::string json = R"({"key":"value"})";
-libjson::JSONObject result = libjson::parse(json);
+libjson::JsonObject result = libjson::parse(json);
 if (result.has("key"))
 {
     std::cout << result.get<std::string>("key") << std::endl;
