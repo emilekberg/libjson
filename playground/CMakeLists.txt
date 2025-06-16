@@ -1,9 +1,5 @@
 project(playground CXX)
 
-set(CMAKE_CXX_COMPILER clang++)
-set(CMAKE_C_COMPILER clang)
-set(CMAKE_CXX_FLAGS "-pg -g") # for gprof (optional)
-
 file(GLOB_RECURSE PLAYGROUND_SOURCES CONFIGURE_DEPENDS "**/*.cpp")
 file(GLOB_RECURSE PLAYGROUND_HEADERS CONFIGURE_DEPENDS
      "${CMAKE_CURRENT_SOURCE_DIR}/src/*.h")

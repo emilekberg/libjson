@@ -1,4 +1,8 @@
 #include "libjson/json-types.h"
+#include "libjson/lexer.h"
+#include "libjson/token.h"
+#include "libjson/token_types.h"
+#include "libjson/tokenizer.h"
 #include <fstream>
 #include <iostream>
 // #include <libjson/json-object.h>
@@ -15,8 +19,11 @@ static std::string loadFile(const std::string &path) {
 
 using namespace libjson;
 int main() {
-  std::string json = loadFile("data/00.json");
-  auto result = libjson::parse(json);
-  auto val = result.get<libjson::JsonArray>().size();
-  return val;
+  const std::string json = loadFile("data/00.json");
+  for (size_t i = 0; i < 10; i++) {
+    libjson::LazyTokenizer tokens(json);
+    while (tokens.next() != libjson::Token_EndOfFile) {
+    }
+  }
+  return 0;
 }
