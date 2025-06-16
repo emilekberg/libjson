@@ -4,6 +4,8 @@
 
 namespace libjson {
 Lexer::Lexer(const std::string_view &input) : _input(input), _position{} {}
+Lexer::Lexer(const std::string_view &&input)
+    : _input(std::move(input)), _position{} {}
 
 void Lexer::nextChar() { ++_position; }
 const char &Lexer::current() const { return _input[_position]; }
@@ -28,7 +30,7 @@ Token Lexer::next() {
     return {TokenTypes::SEPARATOR, _input.substr(_position - 1, 1)};
   }
 
-  else if (isString()) {
+  if (isString()) {
     nextChar();
     size_t start = _position;
 
@@ -49,7 +51,7 @@ Token Lexer::next() {
     return {TokenTypes::STRING, _input.substr(start, end - start)};
   }
 
-  else if (isNumber()) {
+  if (isNumber()) {
     size_t start = _position;
     std::string error;
     // can only contain one minus and it has to be leading.
@@ -97,7 +99,6 @@ Token Lexer::next() {
 
     size_t end = _position;
     std::string_view sub = _input.substr(start, end - start);
-    // if we have a . here we have an issue mr president.
     if (current() == '.') {
       error = "too many .";
     }
@@ -107,7 +108,7 @@ Token Lexer::next() {
     return {TokenTypes::NUMBER, sub};
   }
 
-  else if (isLiteral()) {
+  if (isLiteral()) {
     std::string_view expected_literal;
     size_t start = _position;
     if (current() == 'f') {

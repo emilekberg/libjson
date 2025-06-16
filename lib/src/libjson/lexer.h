@@ -6,6 +6,7 @@ namespace libjson {
 class Lexer {
 public:
   Lexer(const std::string_view &input);
+  Lexer(const std::string_view &&input);
   Token next();
 
   struct Iterator {
@@ -15,10 +16,8 @@ public:
     Iterator(Lexer &lexer, const Token &token)
         : _lexer(lexer), _current(token) {}
 
-    Token &operator*() { return _current; }
-    Token *operator->() { return &_current; }
-
     const Token &operator*() const { return _current; }
+    const Token *operator->() const { return &_current; }
 
     Iterator &operator++() {
       _current = _lexer.next();
@@ -54,7 +53,7 @@ private:
   inline bool isNumberExponentComponent() const;
   inline bool isEndOfFile() const;
 
-  std::string_view _input;
+  const std::string_view _input;
   size_t _position;
 };
 } // namespace libjson

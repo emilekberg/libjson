@@ -10,15 +10,14 @@ namespace libjson {
 
 JsonValue parse(const std::string_view &input) {
   LazyTokenizer tokens(input);
-  Token token = tokens.next();
-  if (token != Token_OpenBracket && token != Token_OpenBracer) {
+  if (tokens.peek() != Token_OpenBracket && tokens.peek() != Token_OpenBracer) {
     std::string err =
         std::format("expected {} or {}, but got {}", Token_OpenBracket.literal,
-                    Token_OpenBracer.literal, token.literal);
+                    Token_OpenBracer.literal, tokens.peek().literal);
     throw std::invalid_argument(err);
   }
 
-  JsonValue result = parseValue(token, tokens);
+  JsonValue result = parseValue(tokens);
   if (tokens.peek() != Token_EndOfFile) {
     throw std::invalid_argument(std::format(
         "Unexpected Token after parsing data. Expected EOF but got {}",
@@ -46,7 +45,7 @@ JsonObject parseObject(LazyTokenizer &tokens) {
           "expected {}, but got {}", Token_Colon.literal, tColon.literal));
     }
 
-    data.emplace(std::string(tKey.literal), parseValue(tokens.next(), tokens));
+    data.emplace(std::string(tKey.literal), parseValue(tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracer) {
@@ -75,7 +74,7 @@ JsonArray parseArray(LazyTokenizer &tokens) {
   }
 
   while (true) {
-    data.emplace_back(parseValue(tokens.next(), tokens));
+    data.emplace_back(parseValue(tokens));
 
     Token tEnd = tokens.next();
     if (tEnd == Token_CloseBracket) {
@@ -111,7 +110,8 @@ JsonValue parseLiteral(const Token &token) {
   throw std::runtime_error("should never come here");
 }
 
-JsonValue parseValue(const Token &token, LazyTokenizer &tokens) {
+JsonValue parseValue(LazyTokenizer &tokens) {
+  Token token = tokens.next();
   switch (token.type) {
   case TokenTypes::STRING:
     return {std::string(token.literal)};

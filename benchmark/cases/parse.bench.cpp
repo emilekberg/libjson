@@ -14,11 +14,8 @@ void RegisterParserBenchmark(const std::string &name, const std::string &path) {
   benchmark::RegisterBenchmark(name.c_str(), [path](benchmark::State &state) {
     std::string json = loadFile(path);
     for (auto _ : state) {
-      // reset position of tokenizer.
-      // tokens.pos = 0;
-
       auto tokens = libjson::LazyTokenizer(json);
-      auto result = libjson::parseValue(tokens.next(), tokens);
+      auto result = libjson::parseValue(tokens);
       benchmark::DoNotOptimize(result);
     }
   });
@@ -35,7 +32,7 @@ void RegisterLexerBenchmark(const std::string &name, const std::string &path) {
   });
 }
 int main(int argc, char **argv) {
-  std::vector<std::string> files = {"data/large-file.json"};
+  std::vector<std::string> files = {"data/large-file.json", "data/00.json"};
 
   for (const auto &file : files) {
     RegisterLexerBenchmark(std::format("MB_Lexer_{}", file), file);
