@@ -5,13 +5,13 @@
 #include <string_view>
 
 namespace libjson {
-Lexer::Lexer(std::istream &ss) : _ss(ss), _buffer{} {
+Lexer::Lexer(std::istream &stream) : _stream(stream), _buffer{} {
   // todo
   fillbuffer();
 }
 void Lexer::fillbuffer() {
-  _ss.read(_buffer, sizeof(_buffer));
-  _buffer_length = _ss.gcount();
+  _stream.read(_buffer, sizeof(_buffer));
+  _buffer_length = _stream.gcount();
   _buffer_position = 0;
 }
 void Lexer::nextChar() {
@@ -171,7 +171,7 @@ bool Lexer::isWhitespace() const {
 }
 
 bool Lexer::isEndOfFile() const {
-  return _buffer_position >= _buffer_length && _ss.eof();
+  return _buffer_position >= _buffer_length && _stream.eof();
 }
 
 bool Lexer::isNumber() const { return isDigit() || current() == '-'; }

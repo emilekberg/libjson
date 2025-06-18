@@ -3,8 +3,8 @@
 namespace libjson {
 class Lexer {
 public:
-  Lexer(std::istream &ss);
-  Lexer(std::istream &&ss);
+  Lexer(std::istream &stream);
+  Lexer(std::istream &&stream);
   Token next();
 
   struct Iterator {
@@ -52,7 +52,7 @@ private:
   inline bool isNumberExponentComponent() const;
   inline bool isEndOfFile() const;
 
-  std::istream &_ss;
+  std::istream &_stream;
   char _buffer[512];
   size_t _buffer_position;
   size_t _buffer_length;
