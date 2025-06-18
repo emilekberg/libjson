@@ -1,12 +1,10 @@
 #pragma once
 #include "token.h"
-#include <sstream>
 namespace libjson {
 class Lexer {
 public:
   Lexer(std::istream &ss);
   Lexer(std::istream &&ss);
-  Lexer(std::string_view str);
   Token next();
 
   struct Iterator {
@@ -43,6 +41,7 @@ public:
 private:
   inline void nextChar();
   inline const char current() const;
+  inline void fillbuffer();
 
   inline bool isWhitespace() const;
   inline bool isSeparator() const;
@@ -54,7 +53,9 @@ private:
   inline bool isEndOfFile() const;
 
   std::istream &_ss;
-  size_t _position;
+  char _buffer[512];
+  size_t _buffer_position;
+  size_t _buffer_length;
   bool _end = false;
   char _current;
 };

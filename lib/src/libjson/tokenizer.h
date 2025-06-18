@@ -20,7 +20,6 @@ private:
 class LazyTokenizer {
 public:
   LazyTokenizer(std::istream &stream);
-  LazyTokenizer(const std::string &string);
   Token next();
   const Token &peek();
 
