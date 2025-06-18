@@ -8,7 +8,7 @@ enum class TokenTypes {
   NUMBER,      // 3.14 or 5 or -123
   LITERAL,     // true, false, null
   END_OF_FILE, // We're done!
-  NONE,        // used when iterating to identify end
+  END,         // used when iterating to identify end
   ILLEGAL,     // unwanted type.
 };
 }

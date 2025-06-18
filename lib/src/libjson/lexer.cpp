@@ -10,10 +10,9 @@ Lexer::Lexer(std::istream &ss) : _ss(ss), _buffer{} {
   fillbuffer();
 }
 void Lexer::fillbuffer() {
-  _ss.read(_buffer, 512);
+  _ss.read(_buffer, sizeof(_buffer));
   _buffer_length = _ss.gcount();
   _buffer_position = 0;
-  // std::cout << "read buffer" << _buffer_length << std::endl;
 }
 void Lexer::nextChar() {
   _buffer_position++;
@@ -34,7 +33,7 @@ Token Lexer::next() {
   }
   if (isEndOfFile()) {
     if (_end) {
-      return {TokenTypes::NONE, "\0"};
+      return {TokenTypes::END, "\0"};
     }
     _end = true;
     return {TokenTypes::END_OF_FILE, "\0"};
@@ -168,24 +167,33 @@ Token Lexer::next() {
 
 bool Lexer::isWhitespace() const {
   char c = current();
-  return current() == ' ' || current() == '\t' || current() == '\n' ||
-         current() == '\r';
+  return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
+
 bool Lexer::isEndOfFile() const {
   return _buffer_position >= _buffer_length && _ss.eof();
 }
+
 bool Lexer::isNumber() const { return isDigit() || current() == '-'; }
+
 bool Lexer::isNumberExponentComponent() const {
   return current() == 'e' || current() == 'E';
 }
+
 bool Lexer::isString() const { return current() == '"'; }
+
 bool Lexer::isLiteral() const {
-  return current() == 'f' || current() == 't' || current() == 'n';
+  return current() == 't' || current() == 'f' || current() == 'n';
 }
+
 bool Lexer::isSeparator() const {
-  return current() == '{' || current() == '}' || current() == '[' ||
-         current() == ']' || current() == ':' || current() == ',';
+  char c = current();
+  return c == '{' || c == '}' || c == '[' || c == ']' || c == ':' || c == ',';
 }
-bool Lexer::isDigit() const { return (current() >= '0' && current() <= '9'); }
+
+bool Lexer::isDigit() const {
+  char c = current();
+  return c >= '0' && c <= '9';
+}
 
 } // namespace libjson

@@ -140,7 +140,7 @@ JsonValue parseValue(LazyTokenizer &tokens) {
         "ParseJsonValue: Reached EOF token when not expecting to.");
 
   case TokenTypes::HEAD:
-  case TokenTypes::NONE:
+  case TokenTypes::END:
     throw std::invalid_argument(
         "ParseJsonValue: Unexpected token type HEAD or NONE.");
   }

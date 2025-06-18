@@ -18,7 +18,7 @@ public:
     const Token *operator->() const { return &_current; }
 
     Iterator &operator++() {
-      _current = _lexer.next();
+      _current = std::move(_lexer.next());
       return *this;
     }
 
@@ -36,7 +36,7 @@ public:
   };
 
   Iterator begin() { return Iterator(*this, this->next()); }
-  Iterator end() { return Iterator(*this, Token_None); }
+  Iterator end() { return Iterator(*this, Token_End); }
 
 private:
   inline void nextChar();
