@@ -12,12 +12,12 @@ Lexer::Lexer(std::istream &ss) : _ss(ss), _position{} { nextChar(); }
 void Lexer::nextChar() {
   // std::cout << _current << std::endl;
 
-  _current = _ss.get();
+  _ss.get(_current);
 }
 const char Lexer::current() const { return _current; }
 
 Token Lexer::next() {
-  while (isWhitespace()) {
+  while (isWhitespace() && _ss.good()) {
     nextChar();
   }
   if (isEndOfFile()) {
@@ -37,7 +37,6 @@ Token Lexer::next() {
   if (isString()) {
     std::ostringstream oss;
 
-    size_t start = _ss.tellg();
     // skip one
     nextChar();
 
@@ -47,7 +46,6 @@ Token Lexer::next() {
       // if we stumble opon an escape sign, we do some skips.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
-        // oss << _ss.get();
         oss << _current;
         nextChar();
 
@@ -55,30 +53,27 @@ Token Lexer::next() {
         // we need to verify what this is, or return invalid token.
       }
 
-      // oss << _ss.get();
       oss << _current;
       nextChar();
     }
-    // size_t count = static_cast<size_t>(_ss.tellg()) - start - 1;
-    // _ss.seekg(start);
-    // std::string s(count, '\0');
-    // _ss.read(&s[0], count);
     nextChar();
-    // nextChar();
 
     return {TokenTypes::STRING, oss.str()};
   }
 
   if (isNumber()) {
-    size_t start = static_cast<size_t>(_ss.tellg()) - 1;
+    std::ostringstream oss;
     std::string error;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
+      oss << _current;
       nextChar();
     }
 
     // 0 can only be first, or fraction.
     if (current() == '0') {
+
+      oss << _current;
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) {
@@ -87,22 +82,31 @@ Token Lexer::next() {
     } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
       while (isDigit()) {
+
+        oss << _current;
         nextChar();
       }
     }
 
     // if we encounter a dot, process all numbers succeeding it.
     if (current() == '.') {
+
+      oss << _current;
       nextChar();
       while (isDigit()) {
+        oss << _current;
         nextChar();
       }
     }
 
     // if the number if exponent, we need to treat that.
     if (isNumberExponentComponent()) {
+
+      oss << _current;
       nextChar();
       if ((current() == '+' || current() == '-')) {
+
+        oss << _current;
         nextChar();
       }
 
@@ -111,6 +115,8 @@ Token Lexer::next() {
         error = "missing digit after exponent";
       }
       while (isDigit()) {
+
+        oss << _current;
         nextChar();
       }
     }
@@ -118,15 +124,11 @@ Token Lexer::next() {
     if (current() == '.') {
       error = "too many .";
     }
-    size_t count = static_cast<size_t>(_ss.tellg()) - start - 1;
-    _ss.seekg(start);
-    std::string s(count, '\0');
-    _ss.read(&s[0], count);
     if (!error.empty()) {
-      return {TokenTypes::ILLEGAL, s};
+      return {TokenTypes::ILLEGAL, oss.str()};
     }
-    nextChar();
-    return {TokenTypes::NUMBER, s};
+    // nextChar();
+    return {TokenTypes::NUMBER, oss.str()};
   }
 
   if (isLiteral()) {
