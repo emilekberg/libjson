@@ -8,7 +8,7 @@ namespace libjson {
 
 class VectorTokenizer {
 public:
-  VectorTokenizer(std::string_view json);
+  VectorTokenizer(std::istream &stream);
   const Token &next();
   const Token &peek();
 
@@ -19,7 +19,8 @@ private:
 
 class LazyTokenizer {
 public:
-  LazyTokenizer(std::string_view json);
+  LazyTokenizer(std::istream &stream);
+  LazyTokenizer(const std::string &string);
   Token next();
   const Token &peek();
 

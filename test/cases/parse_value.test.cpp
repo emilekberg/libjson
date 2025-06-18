@@ -3,7 +3,7 @@
 #include <libjson/parse.h>
 
 TEST(parse, value_string) {
-  std::string input = R"("someString")";
+  std::istringstream input(R"("someString")");
   libjson::LazyTokenizer tokens(input);
   libjson::JsonValue value = libjson::parseValue(tokens);
 
@@ -12,7 +12,7 @@ TEST(parse, value_string) {
 }
 
 TEST(parse, value_double) {
-  std::string input = R"(1234.56)";
+  std::istringstream input(R"(1234.56 )");
   libjson::LazyTokenizer tokens(input);
   libjson::JsonValue value = libjson::parseValue(tokens);
 
@@ -21,7 +21,7 @@ TEST(parse, value_double) {
 }
 
 TEST(parse, value_literal_true) {
-  std::string input = R"(true)";
+  std::istringstream input(R"(true)");
   libjson::LazyTokenizer tokens(input);
   libjson::JsonValue value = libjson::parseValue(tokens);
 
@@ -30,7 +30,7 @@ TEST(parse, value_literal_true) {
 }
 
 TEST(parse, value_literal_false) {
-  std::string input = R"(false)";
+  std::istringstream input(R"(false)");
   libjson::LazyTokenizer tokens(input);
   libjson::JsonValue value = libjson::parseValue(tokens);
 
@@ -39,7 +39,7 @@ TEST(parse, value_literal_false) {
 }
 
 TEST(parse, value_literal_null) {
-  std::string input = R"(null)";
+  std::istringstream input(R"(null)");
   libjson::LazyTokenizer tokens(input);
   libjson::JsonValue value = libjson::parseValue(tokens);
 
@@ -48,7 +48,7 @@ TEST(parse, value_literal_null) {
 }
 
 TEST(Parse, object_empty_object) {
-  std::string input = R"({})";
+  std::istringstream input(R"({})");
 
   libjson::JsonValue value = libjson::parse(input);
   ASSERT_EQ(value.getType(), libjson::ValueType::OBJECT);
@@ -58,7 +58,7 @@ TEST(Parse, object_empty_object) {
 }
 
 TEST(parse, array_empty_array) {
-  std::string input = R"([])";
+  std::istringstream input(R"([])");
   libjson::JsonValue value = libjson::parse(input);
   ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
 

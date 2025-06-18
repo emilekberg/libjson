@@ -8,7 +8,8 @@ TEST(Lexer, object_with_key) {
       {TokenTypes::SEPARATOR, ":"}, {TokenTypes::STRING, "value"},
       {TokenTypes::SEPARATOR, "}"},
   };
-  libjson::Lexer lexer(R"({"key":"value"})");
+  std::istringstream input(R"({"key":"value"})");
+  libjson::Lexer lexer(input);
   libjson::Token t;
   std::vector<libjson::Token> actual_tokens;
   while (true) {
@@ -38,7 +39,8 @@ TEST(Lexer, object_with_number_array) {
       {TokenTypes::NUMBER, "3"},    {TokenTypes::SEPARATOR, ","},
       {TokenTypes::SEPARATOR, "]"}, {TokenTypes::SEPARATOR, "}"},
   };
-  libjson::Lexer lexer(R"({"numbers":[1, 2, 3,]})");
+  std::istringstream input(R"({"numbers":[1, 2, 3,]})");
+  libjson::Lexer lexer(input);
   libjson::Token t;
   std::vector<libjson::Token> actual_tokens;
   while (true) {

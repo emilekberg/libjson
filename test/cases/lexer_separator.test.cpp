@@ -2,7 +2,8 @@
 #include <libjson/lexer.h>
 
 TEST(Lexer, separator_brackets) {
-  libjson::Lexer lexer(R"({})");
+  std::istringstream input(R"({})");
+  libjson::Lexer lexer(input);
   libjson::Token t_openbracket = lexer.next();
   libjson::Token t_closebracket = lexer.next();
 
@@ -14,7 +15,8 @@ TEST(Lexer, separator_brackets) {
 }
 
 TEST(Lexer, separator_array_bracket) {
-  libjson::Lexer lexer(R"([])");
+  std::istringstream input(R"([])");
+  libjson::Lexer lexer(input);
   libjson::Token t_openbracket = lexer.next();
   libjson::Token t_closebracket = lexer.next();
 
@@ -26,7 +28,8 @@ TEST(Lexer, separator_array_bracket) {
 }
 
 TEST(Lexer, separator_colon) {
-  libjson::Lexer lexer(R"(:)");
+  std::istringstream input(R"(:)");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::SEPARATOR);
@@ -34,7 +37,8 @@ TEST(Lexer, separator_colon) {
 }
 
 TEST(Lexer, separator_comma) {
-  libjson::Lexer lexer(R"(,)");
+  std::istringstream input(R"(,)");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::SEPARATOR);

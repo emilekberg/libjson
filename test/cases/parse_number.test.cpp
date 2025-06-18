@@ -1,8 +1,10 @@
 #include <gtest/gtest.h>
 #include <libjson/parse.h>
+#include <sstream>
 
 TEST(parse, number_int) {
-  libjson::LazyTokenizer tokens(R"(420)");
+  std::istringstream ss(R"(420 )");
+  libjson::LazyTokenizer tokens(ss);
   libjson::Token token = tokens.next();
   libjson::JsonValue value = libjson::parseNumber(token);
 
@@ -11,7 +13,9 @@ TEST(parse, number_int) {
 }
 
 TEST(parse, number_uint16_t) {
-  libjson::LazyTokenizer tokens(R"(65535)");
+
+  std::istringstream ss(R"(65535 )");
+  libjson::LazyTokenizer tokens(ss);
   libjson::Token token = tokens.next();
   libjson::JsonValue value = libjson::parseNumber(token);
 

@@ -8,8 +8,8 @@
 #include <string_view>
 namespace libjson {
 
-JsonValue parse(const std::string_view &input) {
-  LazyTokenizer tokens(input);
+JsonValue parse(std::istream &stream) {
+  LazyTokenizer tokens(stream);
   if (tokens.peek() != Token_OpenBracket && tokens.peek() != Token_OpenBracer) {
     std::string err =
         std::format("expected {} or {}, but got {}", Token_OpenBracket.literal,
@@ -18,10 +18,11 @@ JsonValue parse(const std::string_view &input) {
   }
 
   JsonValue result = parseValue(tokens);
-  if (tokens.peek() != Token_EndOfFile) {
+  Token eofToken = tokens.next();
+  if (eofToken != Token_EndOfFile) {
     throw std::invalid_argument(std::format(
         "Unexpected Token after parsing data. Expected EOF but got {}",
-        tokens.peek().literal));
+        eofToken.literal));
   }
   return result;
 }

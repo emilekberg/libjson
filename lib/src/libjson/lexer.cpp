@@ -1,38 +1,45 @@
 #include "lexer.h"
 #include "libjson/token_types.h"
+#include <ios>
+#include <iostream>
+#include <sstream>
 #include <string>
+#include <string_view>
 
 namespace libjson {
-Lexer::Lexer(const std::string_view &input) : _input(input), _position{} {}
-Lexer::Lexer(const std::string_view &&input)
-    : _input(std::move(input)), _position{} {}
+Lexer::Lexer(std::istream &ss) : _ss(ss), _position{} { nextChar(); }
 
-void Lexer::nextChar() { ++_position; }
-const char &Lexer::current() const { return _input[_position]; }
+void Lexer::nextChar() {
+  // std::cout << _current << std::endl;
+
+  _current = _ss.get();
+}
+const char Lexer::current() const { return _current; }
 
 Token Lexer::next() {
   while (isWhitespace()) {
     nextChar();
   }
   if (isEndOfFile()) {
-    // if we have read beyond input size, have read the entire buffer.
-    // this is used when using the iterator.
-    if (_position > _input.size()) {
+    if (_end) {
       return {TokenTypes::NONE, "\0"};
     }
-    // increment the position beyond the input, this signals that we have
-    // processed the entire buffer.
-    ++_position;
+    _end = true;
     return {TokenTypes::END_OF_FILE, "\0"};
   }
+
   if (isSeparator()) {
+    char c = _current;
     nextChar();
-    return {TokenTypes::SEPARATOR, _input.substr(_position - 1, 1)};
+    return {TokenTypes::SEPARATOR, std::string(1, c)};
   }
 
   if (isString()) {
+    std::ostringstream oss;
+
+    size_t start = _ss.tellg();
+    // skip one
     nextChar();
-    size_t start = _position;
 
     // search for the closing quote matching the entry one.
     // if it's escaped, ignore it.
@@ -40,19 +47,30 @@ Token Lexer::next() {
       // if we stumble opon an escape sign, we do some skips.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
+        // oss << _ss.get();
+        oss << _current;
         nextChar();
+
         // TODO: we are now at the escaped sign.
         // we need to verify what this is, or return invalid token.
       }
+
+      // oss << _ss.get();
+      oss << _current;
       nextChar();
     }
-    size_t end = _position;
+    // size_t count = static_cast<size_t>(_ss.tellg()) - start - 1;
+    // _ss.seekg(start);
+    // std::string s(count, '\0');
+    // _ss.read(&s[0], count);
     nextChar();
-    return {TokenTypes::STRING, _input.substr(start, end - start)};
+    // nextChar();
+
+    return {TokenTypes::STRING, oss.str()};
   }
 
   if (isNumber()) {
-    size_t start = _position;
+    size_t start = static_cast<size_t>(_ss.tellg()) - 1;
     std::string error;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
@@ -97,20 +115,22 @@ Token Lexer::next() {
       }
     }
 
-    size_t end = _position;
-    std::string_view sub = _input.substr(start, end - start);
     if (current() == '.') {
       error = "too many .";
     }
+    size_t count = static_cast<size_t>(_ss.tellg()) - start - 1;
+    _ss.seekg(start);
+    std::string s(count, '\0');
+    _ss.read(&s[0], count);
     if (!error.empty()) {
-      return {TokenTypes::ILLEGAL, sub};
+      return {TokenTypes::ILLEGAL, s};
     }
-    return {TokenTypes::NUMBER, sub};
+    nextChar();
+    return {TokenTypes::NUMBER, s};
   }
 
   if (isLiteral()) {
     std::string_view expected_literal;
-    size_t start = _position;
     if (current() == 'f') {
       expected_literal = "false";
     } else if (current() == 't') {
@@ -118,15 +138,13 @@ Token Lexer::next() {
     } else if (current() == 'n') {
       expected_literal = "null";
     }
-    size_t end = _position;
     for (const char &c : expected_literal) {
       if (current() != c) {
-        end = _position;
-        return {TokenTypes::ILLEGAL, _input.substr(start, end - start)};
+        return {TokenTypes::ILLEGAL, ""};
       }
       nextChar();
     }
-    return {TokenTypes::LITERAL, _input.substr(start, expected_literal.size())};
+    return {TokenTypes::LITERAL, std::string(expected_literal)};
   }
 
   return {TokenTypes::ILLEGAL, ""};
@@ -136,7 +154,7 @@ bool Lexer::isWhitespace() const {
   return current() == ' ' || current() == '\t' || current() == '\n' ||
          current() == '\r';
 }
-bool Lexer::isEndOfFile() const { return _position >= _input.size(); }
+bool Lexer::isEndOfFile() const { return _ss.eof(); }
 bool Lexer::isNumber() const { return isDigit() || current() == '-'; }
 bool Lexer::isNumberExponentComponent() const {
   return current() == 'e' || current() == 'E';

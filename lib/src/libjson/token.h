@@ -1,6 +1,6 @@
 #pragma once
 #include "token_types.h"
-#include <string_view>
+#include <string>
 
 namespace libjson {
 
@@ -10,7 +10,7 @@ struct Token {
   }
 
   TokenTypes type;
-  std::string_view literal;
+  std::string literal;
 };
 
 // static const Token Token_StartOfFile = {TokenTypes::HEAD, ""};

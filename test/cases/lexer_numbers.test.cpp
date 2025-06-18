@@ -2,14 +2,17 @@
 #include <libjson/lexer.h>
 
 TEST(Lexer, number) {
-  libjson::Lexer lexer(R"(1337)");
+  std::istringstream input(R"(1337 )");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::NUMBER);
   EXPECT_EQ(t.literal, "1337");
 }
 TEST(Lexer, number_with_dot) {
-  libjson::Lexer lexer(R"(420.69)");
+  std::istringstream input(R"(420.69 )");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::NUMBER);
@@ -17,7 +20,9 @@ TEST(Lexer, number_with_dot) {
 }
 
 TEST(Lexer, number_negative) {
-  libjson::Lexer lexer(R"(-88)");
+  std::istringstream input(R"(-88 )");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::NUMBER);
@@ -25,7 +30,9 @@ TEST(Lexer, number_negative) {
 }
 
 TEST(Lexer, number_negative_with_dot) {
-  libjson::Lexer lexer(R"(-32.15)");
+  std::istringstream input(R"(-32.15 )");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::NUMBER);
@@ -33,7 +40,9 @@ TEST(Lexer, number_negative_with_dot) {
 }
 
 TEST(Lexer, number_invalid_if_multiple_dots) {
-  libjson::Lexer lexer(R"(142.12.152)");
+  std::istringstream input(R"(142.12.152 )");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::ILLEGAL);

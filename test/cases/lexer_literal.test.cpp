@@ -2,7 +2,8 @@
 #include <libjson/lexer.h>
 
 TEST(Lexer, literal_true) {
-  libjson::Lexer lexer(R"(true)");
+  std::istringstream input(R"(true)");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::LITERAL);
@@ -10,7 +11,9 @@ TEST(Lexer, literal_true) {
 }
 
 TEST(Lexer, literal_false) {
-  libjson::Lexer lexer(R"(false)");
+  std::istringstream input(R"(false)");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::LITERAL);
@@ -18,7 +21,9 @@ TEST(Lexer, literal_false) {
 }
 
 TEST(Lexer, literal_null) {
-  libjson::Lexer lexer(R"(null)");
+  std::istringstream input(R"(null)");
+
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::LITERAL);

@@ -4,7 +4,8 @@
 
 using namespace libjson;
 TEST(Parser, parses_object_one_key) {
-  libjson::JsonValue val = libjson::parse(R"({"key":"value"})");
+  std::istringstream input(R"({"key":"value"})");
+  libjson::JsonValue val = libjson::parse(input);
 
   libjson::JsonObject result = val.get<libjson::JsonObject>();
   ASSERT_TRUE(result.has("key"));
@@ -16,7 +17,8 @@ TEST(Parser, parses_object_one_key) {
 }
 
 TEST(Parser, parses_object_two_keys) {
-  JsonValue val = libjson::parse(R"({"a":"first","b":"second"})");
+  std::istringstream input(R"({"a":"first","b":"second"})");
+  JsonValue val = libjson::parse(input);
 
   JsonObject result = val.get<libjson::JsonObject>();
   ASSERT_TRUE(result.has("a"));
@@ -33,8 +35,9 @@ TEST(Parser, parses_object_two_keys) {
 }
 
 TEST(Parser, parses_object_with_object) {
-  libjson::JsonValue val =
-      libjson::parse(R"({"root":{"branch":"deep value"}})");
+
+  std::istringstream input(R"({"root":{"branch":"deep value"}})");
+  libjson::JsonValue val = libjson::parse(input);
 
   libjson::JsonObject result = val.get<libjson::JsonObject>();
   ASSERT_TRUE(result.has("root"));
@@ -50,7 +53,7 @@ TEST(Parser, parses_object_with_object) {
 }
 
 TEST(Parser, parses_array_with_values) {
-  std::string input = R"([{"a":1},{"a":2},{"a":3}])";
+  std::istringstream input(R"([{"a":1},{"a":2},{"a":3}])");
   std::vector<double> expected_arr = {1, 2, 3};
   libjson::JsonValue value = libjson::parse(input);
 
@@ -66,7 +69,7 @@ TEST(Parser, parses_array_with_values) {
 }
 
 TEST(Parser, objects_with_trailing_comma) {
-  std::string json = R"({
+  std::istringstream json(R"({
     "id": "2489651045",
     "actor": {
         "id": 665991,
@@ -86,7 +89,7 @@ TEST(Parser, objects_with_trailing_comma) {
     },
     "public": true,
     "created_at": "2015-01-01T15:00:00Z",
-})";
+})");
   JsonValue value = parse(json);
   EXPECT_EQ(value.getType(), ValueType::OBJECT);
 }

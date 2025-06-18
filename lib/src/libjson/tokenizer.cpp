@@ -3,8 +3,8 @@
 
 namespace libjson {
 
-VectorTokenizer::VectorTokenizer(std::string_view json) {
-  for (const auto &token : Lexer(json)) {
+VectorTokenizer::VectorTokenizer(std::istream &stream) {
+  for (const auto &token : Lexer(stream)) {
 
     if (token.type == TokenTypes::ILLEGAL) {
       throw std::invalid_argument(
@@ -16,7 +16,7 @@ VectorTokenizer::VectorTokenizer(std::string_view json) {
 const Token &VectorTokenizer::next() { return _tokens[_pos++]; }
 const Token &VectorTokenizer::peek() { return _tokens[_pos]; }
 
-LazyTokenizer::LazyTokenizer(std::string_view json) : _lexer(json) {}
+LazyTokenizer::LazyTokenizer(std::istream &stream) : _lexer(stream) {}
 Token LazyTokenizer::next() {
   if (_next.has_value()) {
     Token t = std::move(_next.value());

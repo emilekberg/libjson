@@ -2,10 +2,9 @@
 #include "json-types.h"
 #include "token.h"
 #include "tokenizer.h"
-#include <string_view>
 namespace libjson {
 
-JsonValue parse(const std::string_view &input);
+JsonValue parse(std::istream &stream);
 JsonObject parseObject(LazyTokenizer &tokens);
 JsonValue parseValue(LazyTokenizer &tokens);
 JsonValue parseNumber(const Token &token);

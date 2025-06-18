@@ -8,23 +8,19 @@
 
 class JsonCheckerPassesTests : public ::testing::TestWithParam<std::string> {
 protected:
-  std::string filecontent;
+  std::string path;
 
   void SetUp() override {
-    std::string path = std::format("data/json-checker/{}", GetParam());
-    std::ifstream file(path);
-    ASSERT_TRUE(file.is_open());
-
-    filecontent.assign((std::istreambuf_iterator<char>(file)),
-                       std::istreambuf_iterator<char>());
+    path = std::format("data/json-checker/{}", GetParam());
   }
 };
 
 class JsonCheckerFailsTests : public JsonCheckerPassesTests {};
 
 TEST_P(JsonCheckerFailsTests, fails) {
-  EXPECT_FALSE(filecontent.empty());
-  EXPECT_THROW(libjson::parse(filecontent), std::invalid_argument);
+  std::ifstream file(path);
+  ASSERT_TRUE(file.is_open());
+  EXPECT_THROW(libjson::parse(file), std::invalid_argument);
 }
 INSTANTIATE_TEST_SUITE_P(
     JsonCheckerTestSuite, JsonCheckerFailsTests,
@@ -56,8 +52,9 @@ INSTANTIATE_TEST_SUITE_P(
         "fail33.json"));
 
 TEST_P(JsonCheckerPassesTests, passes) {
-  EXPECT_FALSE(filecontent.empty());
-  EXPECT_NO_THROW(libjson::parse(filecontent));
+  std::ifstream file(path);
+  ASSERT_TRUE(file.is_open());
+  EXPECT_NO_THROW(libjson::parse(file));
 }
 INSTANTIATE_TEST_SUITE_P(JsonCheckerTestSuite, JsonCheckerPassesTests,
                          ::testing::Values("pass1.json", "pass2.json",
