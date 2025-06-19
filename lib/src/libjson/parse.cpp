@@ -115,7 +115,7 @@ JsonValue parseValue(Lexer &lexer) {
   Token token = lexer.next();
   switch (token.type) {
   case TokenTypes::STRING:
-    return {std::string(token.literal)};
+    return {token.literal};
 
   case TokenTypes::NUMBER:
     return parseNumber(token);
@@ -125,7 +125,8 @@ JsonValue parseValue(Lexer &lexer) {
 
   case TokenTypes::LEFT_BRACE:
     return {parseObject(lexer)};
-  case libjson::TokenTypes::LEFT_BRACKET:
+
+  case TokenTypes::LEFT_BRACKET:
     return {parseArray(lexer)};
 
   case TokenTypes::ILLEGAL:
