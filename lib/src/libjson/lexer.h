@@ -1,11 +1,13 @@
 #pragma once
 #include "token.h"
+#include <optional>
 namespace libjson {
 class Lexer {
 public:
   Lexer(std::istream &stream);
   Lexer(std::istream &&stream);
   Token next();
+  Token peek();
 
   struct Iterator {
     using iterator_category = std::forward_iterator_tag;
@@ -39,6 +41,7 @@ public:
   Iterator end() { return Iterator(*this, Token_End); }
 
 private:
+  inline Token tokenize();
   inline void nextChar();
   inline const char current() const;
   inline void fillbuffer();
@@ -58,5 +61,6 @@ private:
   size_t _buffer_length;
   bool _end = false;
   char _current;
+  std::optional<Token> _next;
 };
 } // namespace libjson

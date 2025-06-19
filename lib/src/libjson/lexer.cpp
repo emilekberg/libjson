@@ -27,7 +27,23 @@ const char Lexer::current() const {
   return _buffer[_buffer_position];
 }
 
+Token Lexer::peek() {
+  if (!_next.has_value()) {
+    _next = tokenize();
+  }
+  return _next.value();
+}
+
 Token Lexer::next() {
+  if (_next.has_value()) {
+    Token token = std::move(_next.value());
+    _next.reset();
+    return token;
+  }
+  return tokenize();
+}
+
+Token Lexer::tokenize() {
   while (isWhitespace()) {
     nextChar();
   }

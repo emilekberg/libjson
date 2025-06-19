@@ -4,8 +4,8 @@
 
 TEST(parse, number_int) {
   std::istringstream ss(R"(420 )");
-  libjson::LazyTokenizer tokens(ss);
-  libjson::Token token = tokens.next();
+  libjson::Lexer lexer(ss);
+  libjson::Token token = lexer.next();
   libjson::JsonValue value = libjson::parseNumber(token);
 
   EXPECT_EQ(value.getType(), libjson::ValueType::NUMBER);
@@ -15,8 +15,8 @@ TEST(parse, number_int) {
 TEST(parse, number_uint16_t) {
 
   std::istringstream ss(R"(65535 )");
-  libjson::LazyTokenizer tokens(ss);
-  libjson::Token token = tokens.next();
+  libjson::Lexer lexer(ss);
+  libjson::Token token = lexer.next();
   libjson::JsonValue value = libjson::parseNumber(token);
 
   EXPECT_EQ(value.getType(), libjson::ValueType::NUMBER);

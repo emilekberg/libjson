@@ -16,8 +16,8 @@ void RegisterParserBenchmark(const std::string &name, const std::string &path) {
     for (auto _ : state) {
 
       std::ifstream fstream(path);
-      auto tokens = libjson::LazyTokenizer(fstream);
-      auto result = libjson::parseValue(tokens);
+      auto lexer = libjson::Lexer(fstream);
+      auto result = libjson::parseValue(lexer);
       benchmark::DoNotOptimize(result);
     }
   });
