@@ -40,9 +40,23 @@ Token Lexer::next() {
   }
 
   if (isSeparator()) {
+
     char c = current();
     nextChar();
-    return {TokenTypes::SEPARATOR, std::string(1, c)};
+    switch (c) {
+    case '{':
+      return {TokenTypes::LEFT_BRACE};
+    case '}':
+      return {TokenTypes::RIGHT_BRACE};
+    case '[':
+      return {TokenTypes::LEFT_BRACKET};
+    case ']':
+      return {TokenTypes::RIGHT_BRACKET};
+    case ',':
+      return {TokenTypes::COMMA};
+    case ':':
+      return {TokenTypes::COLON};
+    }
   }
 
   if (isString()) {

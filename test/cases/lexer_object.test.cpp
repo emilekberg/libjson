@@ -4,16 +4,15 @@
 using namespace libjson;
 TEST(Lexer, object_with_key) {
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"}, {TokenTypes::STRING, "key"},
-      {TokenTypes::SEPARATOR, ":"}, {TokenTypes::STRING, "value"},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::LEFT_BRACE},  {TokenTypes::STRING, "key"},
+      {TokenTypes::COLON},       {TokenTypes::STRING, "value"},
+      {TokenTypes::RIGHT_BRACE},
   };
   std::istringstream input(R"({"key":"value"})");
   libjson::Lexer lexer(input);
-  libjson::Token t;
   std::vector<libjson::Token> actual_tokens;
   while (true) {
-    t = lexer.next();
+    libjson::Token t = lexer.next();
     if (t.type == libjson::TokenTypes::END_OF_FILE) {
       break;
     }
@@ -32,19 +31,18 @@ TEST(Lexer, object_with_key) {
 
 TEST(Lexer, object_with_number_array) {
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"}, {TokenTypes::STRING, "numbers"},
-      {TokenTypes::SEPARATOR, ":"}, {TokenTypes::SEPARATOR, "["},
-      {TokenTypes::NUMBER, "1"},    {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::NUMBER, "2"},    {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::NUMBER, "3"},    {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::SEPARATOR, "]"}, {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::LEFT_BRACE},    {TokenTypes::STRING, "numbers"},
+      {TokenTypes::COLON},         {TokenTypes::LEFT_BRACKET},
+      {TokenTypes::NUMBER, "1"},   {TokenTypes::COMMA},
+      {TokenTypes::NUMBER, "2"},   {TokenTypes::COMMA},
+      {TokenTypes::NUMBER, "3"},   {TokenTypes::COMMA},
+      {TokenTypes::RIGHT_BRACKET}, {TokenTypes::RIGHT_BRACE},
   };
   std::istringstream input(R"({"numbers":[1, 2, 3,]})");
   libjson::Lexer lexer(input);
-  libjson::Token t;
   std::vector<libjson::Token> actual_tokens;
   while (true) {
-    t = lexer.next();
+    libjson::Token t = lexer.next();
     if (t.type == libjson::TokenTypes::END_OF_FILE) {
       break;
     }

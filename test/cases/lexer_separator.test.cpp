@@ -7,11 +7,9 @@ TEST(Lexer, separator_brackets) {
   libjson::Token t_openbracket = lexer.next();
   libjson::Token t_closebracket = lexer.next();
 
-  EXPECT_EQ(t_openbracket.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t_openbracket.literal, "{");
+  EXPECT_EQ(t_openbracket.type, libjson::TokenTypes::LEFT_BRACE);
 
-  EXPECT_EQ(t_closebracket.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t_closebracket.literal, "}");
+  EXPECT_EQ(t_closebracket.type, libjson::TokenTypes::RIGHT_BRACE);
 }
 
 TEST(Lexer, separator_array_bracket) {
@@ -20,11 +18,9 @@ TEST(Lexer, separator_array_bracket) {
   libjson::Token t_openbracket = lexer.next();
   libjson::Token t_closebracket = lexer.next();
 
-  EXPECT_EQ(t_openbracket.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t_openbracket.literal, "[");
+  EXPECT_EQ(t_openbracket.type, libjson::TokenTypes::LEFT_BRACKET);
 
-  EXPECT_EQ(t_closebracket.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t_closebracket.literal, "]");
+  EXPECT_EQ(t_closebracket.type, libjson::TokenTypes::RIGHT_BRACKET);
 }
 
 TEST(Lexer, separator_colon) {
@@ -32,8 +28,7 @@ TEST(Lexer, separator_colon) {
   libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
-  EXPECT_EQ(t.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t.literal, ":");
+  EXPECT_EQ(t.type, libjson::TokenTypes::COLON);
 }
 
 TEST(Lexer, separator_comma) {
@@ -41,6 +36,5 @@ TEST(Lexer, separator_comma) {
   libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
 
-  EXPECT_EQ(t.type, libjson::TokenTypes::SEPARATOR);
-  EXPECT_EQ(t.literal, ",");
+  EXPECT_EQ(t.type, libjson::TokenTypes::COMMA);
 }

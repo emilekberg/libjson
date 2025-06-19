@@ -123,14 +123,10 @@ JsonValue parseValue(LazyTokenizer &tokens) {
   case TokenTypes::LITERAL:
     return parseLiteral(token);
 
-  case TokenTypes::SEPARATOR:
-    if (token == Token_OpenBracer) {
-      return {parseObject(tokens)};
-    } else if (token == Token_OpenBracket) {
-      return {parseArray(tokens)};
-    }
-    throw std::invalid_argument(std::format(
-        "ParseJsonValue: Unexpected separator: {}.", token.literal));
+  case TokenTypes::LEFT_BRACE:
+    return {parseObject(tokens)};
+  case libjson::TokenTypes::LEFT_BRACKET:
+    return {parseArray(tokens)};
 
   case TokenTypes::ILLEGAL:
     throw std::invalid_argument("ParseJsonValue: Reached illegal token");
@@ -143,6 +139,12 @@ JsonValue parseValue(LazyTokenizer &tokens) {
   case TokenTypes::END:
     throw std::invalid_argument(
         "ParseJsonValue: Unexpected token type HEAD or NONE.");
+  case TokenTypes::RIGHT_BRACE:
+  case TokenTypes::RIGHT_BRACKET:
+  case TokenTypes::COMMA:
+  case TokenTypes::COLON:
+    throw std::invalid_argument(std::format(
+        "ParseJsonValue: Unexpected separator: {}.", token.literal));
   }
   throw std::invalid_argument("ParseJsonValue: Should never reach here.");
 }

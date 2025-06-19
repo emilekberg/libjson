@@ -43,15 +43,15 @@ TEST(Lexer, string_escape_edgecase) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "message"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "simpler non-flash version\\\\"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "distinct"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
   std::vector<libjson::Token> actual_tokens;
 
@@ -82,16 +82,16 @@ TEST(Lexer, trailing_comma) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "public"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "created_at"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
-      {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::COMMA},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   std::vector<libjson::Token> actual_tokens;
@@ -122,16 +122,16 @@ TEST(Lexer, iterator) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "public"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "created_at"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
-      {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::COMMA},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   size_t count = 0;
