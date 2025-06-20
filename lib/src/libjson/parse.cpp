@@ -46,7 +46,7 @@ JsonObject parseObject(Lexer &lexer) {
           "expected {}, but got {}", Token_Colon.literal, tColon.literal));
     }
 
-    data.emplace(std::string(tKey.literal), parseValue(lexer));
+    data.emplace(std::move(tKey.literal), parseValue(lexer));
 
     Token tEnd = lexer.next();
     if (tEnd == Token_CloseBracer) {
