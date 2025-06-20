@@ -1,12 +1,14 @@
 #pragma once
 #include "token.h"
-#include <string_view>
-
+#include <array>
+#include <optional>
 namespace libjson {
 class Lexer {
 public:
-  Lexer(const std::string_view &input);
+  Lexer(std::istream &stream);
+  Lexer(std::istream &&stream);
   Token next();
+  Token peek();
 
   struct Iterator {
     using iterator_category = std::forward_iterator_tag;
@@ -15,13 +17,11 @@ public:
     Iterator(Lexer &lexer, const Token &token)
         : _lexer(lexer), _current(token) {}
 
-    Token &operator*() { return _current; }
-    Token *operator->() { return &_current; }
-
     const Token &operator*() const { return _current; }
+    const Token *operator->() const { return &_current; }
 
     Iterator &operator++() {
-      _current = _lexer.next();
+      _current = std::move(_lexer.next());
       return *this;
     }
 
@@ -39,11 +39,13 @@ public:
   };
 
   Iterator begin() { return Iterator(*this, this->next()); }
-  Iterator end() { return Iterator(*this, Token_None); }
+  Iterator end() { return Iterator(*this, Token_End); }
 
 private:
+  inline Token tokenize();
   inline void nextChar();
-  inline const char &current() const;
+  inline const char current() const;
+  inline void fillbuffer();
 
   inline bool isWhitespace() const;
   inline bool isSeparator() const;
@@ -54,7 +56,11 @@ private:
   inline bool isNumberExponentComponent() const;
   inline bool isEndOfFile() const;
 
-  std::string_view _input;
-  size_t _position;
+  std::istream &_stream;
+  std::array<char, 512> _buffer;
+  size_t _buffer_position;
+  size_t _buffer_length;
+  bool _end = false;
+  std::optional<Token> _next;
 };
 } // namespace libjson

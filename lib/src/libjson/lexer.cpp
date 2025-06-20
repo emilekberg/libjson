@@ -1,36 +1,87 @@
 #include "lexer.h"
 #include "libjson/token_types.h"
+#include <iostream>
 #include <string>
+#include <string_view>
 
 namespace libjson {
-Lexer::Lexer(const std::string_view &input) : _input(input), _position{} {}
+Lexer::Lexer(std::istream &stream) : _stream(stream), _buffer{} {
+  // todo
+  fillbuffer();
+}
+void Lexer::fillbuffer() {
+  _stream.read(_buffer.data(), sizeof(_buffer));
+  _buffer_length = _stream.gcount();
+  _buffer_position = 0;
+}
+void Lexer::nextChar() {
+  _buffer_position++;
+  if (_buffer_position >= _buffer_length) {
+    fillbuffer();
+  }
+}
+const char Lexer::current() const {
+  if (_buffer_position >= _buffer_length) {
+    return '\0';
+  }
+  return _buffer[_buffer_position];
+}
 
-void Lexer::nextChar() { ++_position; }
-const char &Lexer::current() const { return _input[_position]; }
+Token Lexer::peek() {
+  if (!_next.has_value()) {
+    _next = tokenize();
+  }
+  return _next.value();
+}
 
 Token Lexer::next() {
+  if (_next.has_value()) {
+    Token token = std::move(_next.value());
+    _next.reset();
+    return token;
+  }
+  return tokenize();
+}
+
+Token Lexer::tokenize() {
   while (isWhitespace()) {
     nextChar();
   }
+
   if (isEndOfFile()) {
-    // if we have read beyond input size, have read the entire buffer.
-    // this is used when using the iterator.
-    if (_position > _input.size()) {
-      return {TokenTypes::NONE, "\0"};
+    if (_end) {
+      return {TokenTypes::END};
     }
-    // increment the position beyond the input, this signals that we have
-    // processed the entire buffer.
-    ++_position;
-    return {TokenTypes::END_OF_FILE, "\0"};
-  }
-  if (isSeparator()) {
-    nextChar();
-    return {TokenTypes::SEPARATOR, _input.substr(_position - 1, 1)};
+    _end = true;
+    return {TokenTypes::END_OF_FILE};
   }
 
-  else if (isString()) {
+  if (isSeparator()) {
+
+    char c = current();
     nextChar();
-    size_t start = _position;
+    switch (c) {
+    case '{':
+      return {TokenTypes::LEFT_BRACE};
+    case '}':
+      return {TokenTypes::RIGHT_BRACE};
+    case '[':
+      return {TokenTypes::LEFT_BRACKET};
+    case ']':
+      return {TokenTypes::RIGHT_BRACKET};
+    case ',':
+      return {TokenTypes::COMMA};
+    case ':':
+      return {TokenTypes::COLON};
+    }
+  }
+
+  if (isString()) {
+    std::string buffer;
+    buffer.reserve(64);
+
+    // skip one
+    nextChar();
 
     // search for the closing quote matching the entry one.
     // if it's escaped, ignore it.
@@ -38,78 +89,94 @@ Token Lexer::next() {
       // if we stumble opon an escape sign, we do some skips.
       if (current() == '\\') {
         // since this is escape sign, we skip it.
+        buffer.push_back(current());
         nextChar();
+
         // TODO: we are now at the escaped sign.
         // we need to verify what this is, or return invalid token.
       }
+
+      buffer.push_back(current());
       nextChar();
     }
-    size_t end = _position;
     nextChar();
-    return {TokenTypes::STRING, _input.substr(start, end - start)};
+
+    return {TokenTypes::STRING, std::move(buffer)};
   }
 
-  else if (isNumber()) {
-    size_t start = _position;
-    std::string error;
+  if (isNumber()) {
+    std::string buffer;
+    buffer.reserve(16);
+    bool error = false;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
+      buffer.push_back(current());
       nextChar();
     }
 
     // 0 can only be first, or fraction.
     if (current() == '0') {
+
+      buffer.push_back(current());
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) {
-        error = "leading zero";
+        error = true;
       }
     } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
       while (isDigit()) {
+
+        buffer.push_back(current());
         nextChar();
       }
     }
 
     // if we encounter a dot, process all numbers succeeding it.
     if (current() == '.') {
+
+      buffer.push_back(current());
       nextChar();
       while (isDigit()) {
+        buffer.push_back(current());
         nextChar();
       }
     }
 
     // if the number if exponent, we need to treat that.
     if (isNumberExponentComponent()) {
+
+      buffer.push_back(current());
       nextChar();
       if ((current() == '+' || current() == '-')) {
+
+        buffer.push_back(current());
         nextChar();
       }
 
       // validate that we have at least 1 digit after the exponent.
       if (!isDigit()) {
-        error = "missing digit after exponent";
+        error = true;
       }
       while (isDigit()) {
+
+        buffer.push_back(current());
         nextChar();
       }
     }
 
-    size_t end = _position;
-    std::string_view sub = _input.substr(start, end - start);
-    // if we have a . here we have an issue mr president.
     if (current() == '.') {
-      error = "too many .";
+      error = true;
     }
-    if (!error.empty()) {
-      return {TokenTypes::ILLEGAL, sub};
+    if (error) {
+      return {TokenTypes::ILLEGAL, std::move(buffer)};
     }
-    return {TokenTypes::NUMBER, sub};
+    // nextChar();
+    return {TokenTypes::NUMBER, std::move(buffer)};
   }
 
-  else if (isLiteral()) {
+  if (isLiteral()) {
     std::string_view expected_literal;
-    size_t start = _position;
     if (current() == 'f') {
       expected_literal = "false";
     } else if (current() == 't') {
@@ -117,37 +184,47 @@ Token Lexer::next() {
     } else if (current() == 'n') {
       expected_literal = "null";
     }
-    size_t end = _position;
     for (const char &c : expected_literal) {
       if (current() != c) {
-        end = _position;
-        return {TokenTypes::ILLEGAL, _input.substr(start, end - start)};
+        return {TokenTypes::ILLEGAL};
       }
       nextChar();
     }
-    return {TokenTypes::LITERAL, _input.substr(start, expected_literal.size())};
+    return {TokenTypes::LITERAL, std::string(expected_literal)};
   }
 
-  return {TokenTypes::ILLEGAL, ""};
+  return {TokenTypes::ILLEGAL};
 }
 
 bool Lexer::isWhitespace() const {
-  return current() == ' ' || current() == '\t' || current() == '\n' ||
-         current() == '\r';
+  char c = current();
+  return c == ' ' || c == '\t' || c == '\n' || c == '\r';
 }
-bool Lexer::isEndOfFile() const { return _position >= _input.size(); }
+
+bool Lexer::isEndOfFile() const {
+  return _buffer_position >= _buffer_length && _stream.eof();
+}
+
 bool Lexer::isNumber() const { return isDigit() || current() == '-'; }
+
 bool Lexer::isNumberExponentComponent() const {
   return current() == 'e' || current() == 'E';
 }
+
 bool Lexer::isString() const { return current() == '"'; }
+
 bool Lexer::isLiteral() const {
-  return current() == 'f' || current() == 't' || current() == 'n';
+  return current() == 't' || current() == 'f' || current() == 'n';
 }
+
 bool Lexer::isSeparator() const {
-  return current() == '{' || current() == '}' || current() == '[' ||
-         current() == ']' || current() == ':' || current() == ',';
+  char c = current();
+  return c == '{' || c == '}' || c == '[' || c == ']' || c == ':' || c == ',';
 }
-bool Lexer::isDigit() const { return (current() >= '0' && current() <= '9'); }
+
+bool Lexer::isDigit() const {
+  char c = current();
+  return c >= '0' && c <= '9';
+}
 
 } // namespace libjson

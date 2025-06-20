@@ -5,15 +5,18 @@
 using namespace libjson;
 
 TEST(Lexer, skips_leading_whitespace) {
-  libjson::Lexer lexer(R"(       "ignored leading whitespace"      )");
+  std::istringstream input(R"(       "ignored leading whitespace"      )");
+  Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
   EXPECT_EQ(t.literal, "ignored leading whitespace");
 }
 
 TEST(Lexer, skips_middle_whitespace) {
-  libjson::Lexer lexer(
+  std::istringstream input(
       R"(       "we've had one string yes"   "what about 2nd string"   )");
+
+  Lexer lexer(input);
   libjson::Token t1 = lexer.next();
   libjson::Token t2 = lexer.next();
   EXPECT_EQ(t1.type, libjson::TokenTypes::STRING);
@@ -24,7 +27,9 @@ TEST(Lexer, skips_middle_whitespace) {
 }
 
 TEST(Lexer, eof) {
-  libjson::Lexer lexer("");
+  std::istringstream input("");
+
+  Lexer lexer(input);
   libjson::Token t = lexer.next();
 
   EXPECT_EQ(t.type, libjson::TokenTypes::END_OF_FILE);
@@ -32,21 +37,21 @@ TEST(Lexer, eof) {
 }
 
 TEST(Lexer, string_escape_edgecase) {
-  std::string input(R"({
+  std::istringstream input(R"({
   "message":"simpler non-flash version\\",
   "distinct":true
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "message"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "simpler non-flash version\\\\"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "distinct"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
   std::vector<libjson::Token> actual_tokens;
 
@@ -71,22 +76,22 @@ TEST(Lexer, string_escape_edgecase) {
 }
 
 TEST(Lexer, trailing_comma) {
-  std::string input = R"({
+  std::istringstream input(R"({
     "public": true,
     "created_at": "2015-01-01T15:00:00Z",
-})";
+})");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "public"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "created_at"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
-      {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::COMMA},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   std::vector<libjson::Token> actual_tokens;
@@ -111,22 +116,22 @@ TEST(Lexer, trailing_comma) {
 }
 
 TEST(Lexer, iterator) {
-  std::string input = R"({
+  std::istringstream input(R"({
     "public": true,
     "created_at": "2015-01-01T15:00:00Z",
-})";
+})");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::SEPARATOR, "{"},
+      {TokenTypes::LEFT_BRACE},
       {TokenTypes::STRING, "public"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::SEPARATOR, ","},
+      {TokenTypes::COMMA},
       {TokenTypes::STRING, "created_at"},
-      {TokenTypes::SEPARATOR, ":"},
+      {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
-      {TokenTypes::SEPARATOR, ","},
-      {TokenTypes::SEPARATOR, "}"},
+      {TokenTypes::COMMA},
+      {TokenTypes::RIGHT_BRACE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   size_t count = 0;

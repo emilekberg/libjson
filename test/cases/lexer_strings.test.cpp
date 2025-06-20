@@ -3,21 +3,23 @@
 #include <libjson/lexer.h>
 
 TEST(Lexer, string_quotes) {
-  libjson::Lexer lexer(R"("string with quotes")");
+  std::istringstream input(R"("string with quotes")");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
   EXPECT_EQ(t.literal, "string with quotes");
 }
 
 TEST(Lexer, string_quotes_can_contain_single) {
-  libjson::Lexer lexer(R"("has 'single'")");
+  std::istringstream input(R"("has 'single'")");
+  libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
   EXPECT_EQ(t.literal, "has 'single'");
 }
 
 TEST(Lexer, string_can_escape) {
-  std::string input = R"("string can contain \"escaped\" substrings")";
+  std::istringstream input(R"("string can contain \"escaped\" substrings")");
   libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);
@@ -26,7 +28,7 @@ TEST(Lexer, string_can_escape) {
 
 TEST(Lexer, string_scaped_start_end) {
   GTEST_SKIP_("not sure why it's not working");
-  std::string input = R"("\"Update the package list\"")";
+  std::istringstream input(R"("\"Update the package list\"")");
   libjson::Lexer lexer(input);
   libjson::Token t = lexer.next();
   EXPECT_EQ(t.type, libjson::TokenTypes::STRING);

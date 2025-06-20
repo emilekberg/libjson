@@ -6,7 +6,7 @@ This is probably not a :fire: blazing fast parser. But I made it. With :hearts:
 
 The purpose of this was for me to try writing a lexer and parser, rather than solving a non-existing problem.
 
-It uses `std::string_view` internally so make sure your string outlives the parsing scope. Once you have a json object it should be all good however as it copies strings and values into the json data where it needs (strings, numbers).
+Lexer expects an `std::istream`. Lexer parses lazy and returns a `Token_EndOfFile` when reaching end of file, and beyond that will return a `Token_End`.
 
 It evaluates numbers from strings when you requrest it so take note of that. This is tradeoff for sake of supporting more arithmetic types.
 
@@ -42,7 +42,7 @@ cmake --build build/Release
 
 build `release` like above, then
 ```bash
-./build/Debug/benchmark/libjson_bench
+./build/Release/benchmark/libjson_bench
 ```
 
 ```
@@ -57,6 +57,8 @@ MB_Parse_data/large-file.json  134794042 ns    128762562 ns            4
 
 - [/] https://github.com/briandfoy/json-acceptance-tests/tree/master
   - supports most, some which i've intentionally left out for now.
+- [ ] support both `std::string_view` and `std::istream`.
+  - I expect `std::string_view` to be faster, but require more memory ahead of time.
 
 ## Features
 
@@ -76,9 +78,22 @@ MB_Parse_data/large-file.json  134794042 ns    128762562 ns            4
 
 ## Example
 
+### Construction
 ```cpp
-std::string json = R"({"key":"value"})";
-libjson::JSONObject result = libjson::parse(json);
+libjson::JsonObject obj({
+  {"name", "emil"},
+  {"age", JsonNumber("12")},
+});
+
+std::cout << "name is: " << obj.get<JsonString>("name") << std::endl;
+std::cout << "age is: " << obj.get<uint16_t>("age") << std::endl;
+```
+
+
+### Parse
+```cpp
+std::istringstream stream(R"({"key":"value"})");
+libjson::JsonObject result = libjson::parse(stream);
 if (result.has("key"))
 {
     std::cout << result.get<std::string>("key") << std::endl;

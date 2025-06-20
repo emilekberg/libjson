@@ -1,95 +1,87 @@
 #include "parse.h"
+#include "exceptions.h"
 #include "json-types.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
 #include <format>
 #include <stdexcept>
-#include <string_view>
 namespace libjson {
 
-JsonValue parse(const std::string_view &input) {
-  LazyTokenizer tokens(input);
-  Token token = tokens.next();
-  if (token != Token_OpenBracket && token != Token_OpenBracer) {
-    std::string err =
-        std::format("expected {} or {}, but got {}", Token_OpenBracket.literal,
-                    Token_OpenBracer.literal, token.literal);
-    throw std::invalid_argument(err);
+JsonValue parse(std::istream &stream) {
+  Lexer lexer(stream);
+  if (lexer.peek() != Token_OpenBracket && lexer.peek() != Token_OpenBracer) {
+    throw unexpected_token(lexer.peek().literal, Token_OpenBracer.literal,
+                           Token_OpenBracket.literal);
   }
 
-  JsonValue result = parseValue(token, tokens);
-  if (tokens.peek() != Token_EndOfFile) {
-    throw std::invalid_argument(std::format(
-        "Unexpected Token after parsing data. Expected EOF but got {}",
-        tokens.peek().literal));
+  JsonValue result = parseValue(lexer);
+  Token eofToken = lexer.next();
+  if (eofToken != Token_EndOfFile) {
+    throw unexpected_token(eofToken.literal, "EOF");
   }
   return result;
 }
 
-JsonObject parseObject(LazyTokenizer &tokens) {
+JsonObject parseObject(Lexer &lexer) {
   JsonObjectData data;
-  if (tokens.peek() == Token_CloseBracer) {
-    tokens.next();
+  if (lexer.peek() == Token_CloseBracer) {
+    lexer.next();
     return {data};
   }
 
   while (true) {
-    Token tKey = tokens.next();
+    Token tKey = lexer.next();
     if (tKey.type != TokenTypes::STRING) {
-      throw std::invalid_argument(
-          std::format("expected {}, but got {}", "string", tKey.literal));
+      throw unexpected_token(tKey.literal, "\"(double-quote)");
     }
-    Token tColon = tokens.next();
+    Token tColon = lexer.next();
     if (tColon != Token_Colon) {
-      throw std::invalid_argument(std::format(
-          "expected {}, but got {}", Token_Colon.literal, tColon.literal));
+      throw unexpected_token(tColon.literal, ":");
     }
 
-    data.emplace(std::string(tKey.literal), parseValue(tokens.next(), tokens));
+    data.emplace(tKey.literal, parseValue(lexer));
 
-    Token tEnd = tokens.next();
+    Token tEnd = lexer.next();
     if (tEnd == Token_CloseBracer) {
       break;
     }
 
     // support trailing comma
-    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
-      tokens.next();
+    if (tEnd == Token_Comma && lexer.peek() == Token_CloseBracer) {
+      lexer.next();
       break;
     }
     if (tEnd != Token_Comma) {
-      throw std::invalid_argument(std::format(
-          "parseObject: UnexpectedToken. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseBracer.literal, tEnd.literal));
+      throw unexpected_token(tEnd.literal, Token_CloseBracer.literal,
+                             Token_Comma.literal);
     }
   }
   return {data};
 }
 
-JsonArray parseArray(LazyTokenizer &tokens) {
+JsonArray parseArray(Lexer &lexer) {
   JsonArrayData data;
-  if (tokens.peek() == Token_CloseBracket) {
-    tokens.next();
+  if (lexer.peek() == Token_CloseBracket) {
+    lexer.next();
     return {data};
   }
 
   while (true) {
-    data.emplace_back(parseValue(tokens.next(), tokens));
+    data.emplace_back(parseValue(lexer));
 
-    Token tEnd = tokens.next();
+    Token tEnd = lexer.next();
     if (tEnd == Token_CloseBracket) {
       return {data};
     }
-    if (tEnd == Token_Comma && tokens.peek() == Token_CloseBracer) {
+    if (tEnd == Token_Comma && lexer.peek() == Token_CloseBracer) {
       // support trailing comma
-      tokens.next();
+      lexer.next();
       return {data};
     }
     if (tEnd != Token_Comma) {
-      throw std::invalid_argument(std::format(
-          "parseArray: Unexpected Token. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
+      throw unexpected_token(tEnd.literal, Token_CloseBracket.literal,
+                             Token_Comma.literal);
     }
   }
   return {data};
@@ -111,10 +103,11 @@ JsonValue parseLiteral(const Token &token) {
   throw std::runtime_error("should never come here");
 }
 
-JsonValue parseValue(const Token &token, LazyTokenizer &tokens) {
+JsonValue parseValue(Lexer &lexer) {
+  Token token = lexer.next();
   switch (token.type) {
   case TokenTypes::STRING:
-    return {std::string(token.literal)};
+    return {token.literal};
 
   case TokenTypes::NUMBER:
     return parseNumber(token);
@@ -122,26 +115,26 @@ JsonValue parseValue(const Token &token, LazyTokenizer &tokens) {
   case TokenTypes::LITERAL:
     return parseLiteral(token);
 
-  case TokenTypes::SEPARATOR:
-    if (token == Token_OpenBracer) {
-      return {parseObject(tokens)};
-    } else if (token == Token_OpenBracket) {
-      return {parseArray(tokens)};
-    }
-    throw std::invalid_argument(std::format(
-        "ParseJsonValue: Unexpected separator: {}.", token.literal));
+  case TokenTypes::LEFT_BRACE:
+    return {parseObject(lexer)};
+
+  case TokenTypes::LEFT_BRACKET:
+    return {parseArray(lexer)};
 
   case TokenTypes::ILLEGAL:
-    throw std::invalid_argument("ParseJsonValue: Reached illegal token");
+    throw unexpected_token(token.literal, "Not Illegal Token");
 
   case TokenTypes::END_OF_FILE:
-    throw std::invalid_argument(
-        "ParseJsonValue: Reached EOF token when not expecting to.");
+    throw unexpected_token(token.literal, "Not EOF Token");
 
   case TokenTypes::HEAD:
-  case TokenTypes::NONE:
-    throw std::invalid_argument(
-        "ParseJsonValue: Unexpected token type HEAD or NONE.");
+  case TokenTypes::END:
+    throw unexpected_token(token.literal, "Not HEAD or END Token");
+  case TokenTypes::RIGHT_BRACE:
+  case TokenTypes::RIGHT_BRACKET:
+  case TokenTypes::COMMA:
+  case TokenTypes::COLON:
+    throw unexpected_token(token.literal, "Unexpected Separator");
   }
   throw std::invalid_argument("ParseJsonValue: Should never reach here.");
 }

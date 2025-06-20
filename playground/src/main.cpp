@@ -1,9 +1,12 @@
+#include "libjson/json-types.h"
+#include "libjson/lexer.h"
+#include "libjson/token.h"
+#include "libjson/token_types.h"
+#include <cassert>
 #include <fstream>
 #include <iostream>
-// #include <libjson/json-object.h>
-// #include <libjson/parse.h>
-#include "types.h"
 #include <libjson/concepts.h>
+#include <libjson/parse.h>
 #include <sstream>
 
 static std::string loadFile(const std::string &path) {
@@ -13,22 +16,20 @@ static std::string loadFile(const std::string &path) {
   return ss.str();
 }
 
+using namespace libjson;
 int main() {
-  JsonArray arr1({JsonNumber("1"), JsonNumber("3")});
-  JsonArray arr({true, JsonNumber("13.37"), arr1});
-  if (arr.get<bool>(0)) {
-    float f = arr.get<float>(1);
-    for (const auto &v : arr.get<JsonArray>(2)._data) {
-      std::cout << v.get<int>() << std::endl;
+  std::istringstream stream(R"({"numbers":[1, 2, 3,]})");
+  // const std::string json = loadFile("data/json-checker/pass01.json");
+  // std::ifstream stream("data/json-checker/pass1.json");
+
+  // assert(stream.good());
+  // libjson::JsonValue json = libjson::parse(stream);
+  // std::istringstream stream(R"({"numbers":[1, 2, 3,]})");
+  for (const auto token : Lexer(stream)) {
+    std::cout << token.literal << std::endl;
+    if (token.type == TokenTypes::ILLEGAL) {
+      return -1;
     }
-    return 0;
   }
-  // std::string json = loadFile("data/large-file.json");
-  //    std::string json = R"({
-  //      "public": true,
-  //      "created_at": "2015-01-01T15:00:00Z",
-  //  })";
-  // libjson::parse(json);
-  // auto val = result.get<libjson::JsonObject>();
   return 0;
 }
