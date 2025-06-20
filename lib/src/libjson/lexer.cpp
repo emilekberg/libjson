@@ -10,7 +10,7 @@ Lexer::Lexer(std::istream &stream) : _stream(stream), _buffer{} {
   fillbuffer();
 }
 void Lexer::fillbuffer() {
-  _stream.read(_buffer, sizeof(_buffer));
+  _stream.read(_buffer.data(), sizeof(_buffer));
   _buffer_length = _stream.gcount();
   _buffer_position = 0;
 }
@@ -47,12 +47,13 @@ Token Lexer::tokenize() {
   while (isWhitespace()) {
     nextChar();
   }
+
   if (isEndOfFile()) {
     if (_end) {
-      return {TokenTypes::END, "\0"};
+      return {TokenTypes::END};
     }
     _end = true;
-    return {TokenTypes::END_OF_FILE, "\0"};
+    return {TokenTypes::END_OF_FILE};
   }
 
   if (isSeparator()) {
@@ -105,8 +106,8 @@ Token Lexer::tokenize() {
 
   if (isNumber()) {
     std::string buffer;
-    buffer.reserve(64);
-    std::string error;
+    buffer.reserve(16);
+    bool error = false;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       buffer.push_back(current());
@@ -120,7 +121,7 @@ Token Lexer::tokenize() {
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) {
-        error = "leading zero";
+        error = true;
       }
     } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
@@ -155,7 +156,7 @@ Token Lexer::tokenize() {
 
       // validate that we have at least 1 digit after the exponent.
       if (!isDigit()) {
-        error = "missing digit after exponent";
+        error = true;
       }
       while (isDigit()) {
 
@@ -165,9 +166,9 @@ Token Lexer::tokenize() {
     }
 
     if (current() == '.') {
-      error = "too many .";
+      error = true;
     }
-    if (!error.empty()) {
+    if (error) {
       return {TokenTypes::ILLEGAL, std::move(buffer)};
     }
     // nextChar();
@@ -185,14 +186,14 @@ Token Lexer::tokenize() {
     }
     for (const char &c : expected_literal) {
       if (current() != c) {
-        return {TokenTypes::ILLEGAL, ""};
+        return {TokenTypes::ILLEGAL};
       }
       nextChar();
     }
     return {TokenTypes::LITERAL, std::string(expected_literal)};
   }
 
-  return {TokenTypes::ILLEGAL, ""};
+  return {TokenTypes::ILLEGAL};
 }
 
 bool Lexer::isWhitespace() const {

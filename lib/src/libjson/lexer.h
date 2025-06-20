@@ -1,5 +1,6 @@
 #pragma once
 #include "token.h"
+#include <array>
 #include <optional>
 namespace libjson {
 class Lexer {
@@ -56,11 +57,10 @@ private:
   inline bool isEndOfFile() const;
 
   std::istream &_stream;
-  char _buffer[512];
+  std::array<char, 512> _buffer;
   size_t _buffer_position;
   size_t _buffer_length;
   bool _end = false;
-  char _current;
   std::optional<Token> _next;
 };
 } // namespace libjson
