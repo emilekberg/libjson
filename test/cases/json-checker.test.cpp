@@ -2,9 +2,8 @@
 #include <format>
 #include <fstream>
 #include <gtest/gtest.h>
-#include <iterator>
+#include <libjson/exceptions.h>
 #include <libjson/parse.h>
-#include <stdexcept>
 
 class JsonCheckerPassesTests : public ::testing::TestWithParam<std::string> {
 protected:
@@ -20,7 +19,7 @@ class JsonCheckerFailsTests : public JsonCheckerPassesTests {};
 TEST_P(JsonCheckerFailsTests, fails) {
   std::ifstream file(path);
   ASSERT_TRUE(file.is_open());
-  EXPECT_THROW(libjson::parse(file), std::invalid_argument);
+  EXPECT_THROW(libjson::parse(file), libjson::unexpected_token);
 }
 INSTANTIATE_TEST_SUITE_P(
     JsonCheckerTestSuite, JsonCheckerFailsTests,

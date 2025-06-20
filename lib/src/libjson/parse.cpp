@@ -1,28 +1,24 @@
 #include "parse.h"
+#include "exceptions.h"
 #include "json-types.h"
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
 #include <format>
 #include <stdexcept>
-#include <string_view>
 namespace libjson {
 
 JsonValue parse(std::istream &stream) {
   Lexer lexer(stream);
   if (lexer.peek() != Token_OpenBracket && lexer.peek() != Token_OpenBracer) {
-    std::string err =
-        std::format("expected {} or {}, but got {}", Token_OpenBracket.literal,
-                    Token_OpenBracer.literal, lexer.peek().literal);
-    throw std::invalid_argument(err);
+    throw unexpected_token(lexer.peek().literal, Token_OpenBracer.literal,
+                           Token_OpenBracket.literal);
   }
 
   JsonValue result = parseValue(lexer);
   Token eofToken = lexer.next();
   if (eofToken != Token_EndOfFile) {
-    throw std::invalid_argument(std::format(
-        "Unexpected Token after parsing data. Expected EOF but got {}",
-        eofToken.literal));
+    throw unexpected_token(eofToken.literal, "EOF");
   }
   return result;
 }
@@ -37,16 +33,14 @@ JsonObject parseObject(Lexer &lexer) {
   while (true) {
     Token tKey = lexer.next();
     if (tKey.type != TokenTypes::STRING) {
-      throw std::invalid_argument(
-          std::format("expected {}, but got {}", "string", tKey.literal));
+      throw unexpected_token(tKey.literal, "\"(double-quote)");
     }
     Token tColon = lexer.next();
     if (tColon != Token_Colon) {
-      throw std::invalid_argument(std::format(
-          "expected {}, but got {}", Token_Colon.literal, tColon.literal));
+      throw unexpected_token(tColon.literal, ":");
     }
 
-    data.emplace(std::move(tKey.literal), parseValue(lexer));
+    data.emplace(tKey.literal, parseValue(lexer));
 
     Token tEnd = lexer.next();
     if (tEnd == Token_CloseBracer) {
@@ -59,9 +53,8 @@ JsonObject parseObject(Lexer &lexer) {
       break;
     }
     if (tEnd != Token_Comma) {
-      throw std::invalid_argument(std::format(
-          "parseObject: UnexpectedToken. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseBracer.literal, tEnd.literal));
+      throw unexpected_token(tEnd.literal, Token_CloseBracer.literal,
+                             Token_Comma.literal);
     }
   }
   return {data};
@@ -87,9 +80,8 @@ JsonArray parseArray(Lexer &lexer) {
       return {data};
     }
     if (tEnd != Token_Comma) {
-      throw std::invalid_argument(std::format(
-          "parseArray: Unexpected Token. Expected {} or {}, but got {}",
-          Token_Comma.literal, Token_CloseBracket.literal, tEnd.literal));
+      throw unexpected_token(tEnd.literal, Token_CloseBracket.literal,
+                             Token_Comma.literal);
     }
   }
   return {data};
@@ -130,22 +122,19 @@ JsonValue parseValue(Lexer &lexer) {
     return {parseArray(lexer)};
 
   case TokenTypes::ILLEGAL:
-    throw std::invalid_argument("ParseJsonValue: Reached illegal token");
+    throw unexpected_token(token.literal, "Not Illegal Token");
 
   case TokenTypes::END_OF_FILE:
-    throw std::invalid_argument(
-        "ParseJsonValue: Reached EOF token when not expecting to.");
+    throw unexpected_token(token.literal, "Not EOF Token");
 
   case TokenTypes::HEAD:
   case TokenTypes::END:
-    throw std::invalid_argument(
-        "ParseJsonValue: Unexpected token type HEAD or NONE.");
+    throw unexpected_token(token.literal, "Not HEAD or END Token");
   case TokenTypes::RIGHT_BRACE:
   case TokenTypes::RIGHT_BRACKET:
   case TokenTypes::COMMA:
   case TokenTypes::COLON:
-    throw std::invalid_argument(std::format(
-        "ParseJsonValue: Unexpected separator: {}.", token.literal));
+    throw unexpected_token(token.literal, "Unexpected Separator");
   }
   throw std::invalid_argument("ParseJsonValue: Should never reach here.");
 }
