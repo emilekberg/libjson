@@ -9,11 +9,7 @@ namespace libjson {
 
 JsonValue parse(std::istream &stream) {
   Lexer lexer(stream);
-  if (lexer.peek() != Token_OpenBracket && lexer.peek() != Token_OpenBracer) {
-    throw unexpected_token(lexer.peek().literal, Token_OpenBracer.literal,
-                           Token_OpenBracket.literal);
-  }
-
+  expect_tokens(lexer.peek(), Token_OpenBracer, Token_OpenBracket);
   JsonValue result = parseValue(lexer);
   expect_token(lexer.next(), Token_EndOfFile);
   return result;
