@@ -13,14 +13,14 @@ struct Token {
   std::string literal;
 };
 
-// static const Token Token_StartOfFile = {TokenTypes::HEAD, ""};
-static const Token Token_OpenBracer = {TokenTypes::LEFT_BRACE};
-static const Token Token_CloseBracer = {TokenTypes::RIGHT_BRACE};
-static const Token Token_OpenBracket = {TokenTypes::LEFT_BRACKET};
-static const Token Token_CloseBracket = {TokenTypes::RIGHT_BRACKET};
-static const Token Token_Comma = {TokenTypes::COMMA};
-static const Token Token_Colon = {TokenTypes::COLON};
-static const Token Token_EndOfFile = {TokenTypes::END_OF_FILE, "\0"};
+static const Token Token_OpenBracer = {TokenTypes::LEFT_BRACE, "{"};
+static const Token Token_CloseBracer = {TokenTypes::RIGHT_BRACE, "}"};
+static const Token Token_OpenBracket = {TokenTypes::LEFT_BRACKET, "["};
+static const Token Token_CloseBracket = {TokenTypes::RIGHT_BRACKET, "]"};
+static const Token Token_Comma = {TokenTypes::COMMA, ","};
+static const Token Token_Colon = {TokenTypes::COLON, ":"};
+static const Token Token_EndOfFile = {TokenTypes::END_OF_FILE, "EOF"};
+static const Token Token_String = {TokenTypes::STRING, "\" (double-quote)"};
 static const Token Token_End = {TokenTypes::END, "\0"};
 
 } // namespace libjson

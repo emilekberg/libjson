@@ -1,6 +1,8 @@
+#include "token.h"
 #include <format>
 #include <string>
 namespace libjson {
+
 class unexpected_token : public std::exception {
 private:
   std::string message;
@@ -16,4 +18,17 @@ public:
 
   const char *what() const noexcept { return message.c_str(); }
 };
+
+static inline void expect_token(const Token &actual, const Token &expected) {
+  if (actual != expected) [[unlikely]]
+    throw unexpected_token(actual.literal, expected.literal);
+}
+
+static inline void expect_token(const Token &actual,
+                                const Token &expected_first,
+                                const Token &expected_second) {
+  if (actual != expected_first && actual != expected_second) [[unlikely]]
+    throw unexpected_token(actual.literal, expected_first.literal,
+                           expected_second.literal);
+}
 } // namespace libjson

@@ -4,7 +4,6 @@
 #include "token.h"
 #include "token_types.h"
 #include <cassert>
-#include <format>
 #include <stdexcept>
 namespace libjson {
 
@@ -16,10 +15,7 @@ JsonValue parse(std::istream &stream) {
   }
 
   JsonValue result = parseValue(lexer);
-  Token eofToken = lexer.next();
-  if (eofToken != Token_EndOfFile) {
-    throw unexpected_token(eofToken.literal, "EOF");
-  }
+  expect_token(lexer.next(), Token_EndOfFile);
   return result;
 }
 
@@ -32,13 +28,8 @@ JsonObject parseObject(Lexer &lexer) {
 
   while (true) {
     Token tKey = lexer.next();
-    if (tKey.type != TokenTypes::STRING) {
-      throw unexpected_token(tKey.literal, "\"(double-quote)");
-    }
-    Token tColon = lexer.next();
-    if (tColon != Token_Colon) {
-      throw unexpected_token(tColon.literal, ":");
-    }
+    expect_token(tKey, Token_String);
+    expect_token(lexer.next(), Token_Colon);
 
     data.emplace(tKey.literal, parseValue(lexer));
 
@@ -52,10 +43,7 @@ JsonObject parseObject(Lexer &lexer) {
       lexer.next();
       break;
     }
-    if (tEnd != Token_Comma) {
-      throw unexpected_token(tEnd.literal, Token_CloseBracer.literal,
-                             Token_Comma.literal);
-    }
+    expect_token(tEnd, Token_Comma);
   }
   return {data};
 }
@@ -79,10 +67,7 @@ JsonArray parseArray(Lexer &lexer) {
       lexer.next();
       return {data};
     }
-    if (tEnd != Token_Comma) {
-      throw unexpected_token(tEnd.literal, Token_CloseBracket.literal,
-                             Token_Comma.literal);
-    }
+    expect_token(tEnd, Token_Comma);
   }
   return {data};
 }

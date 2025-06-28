@@ -44,11 +44,11 @@ Token Lexer::next() {
 }
 
 Token Lexer::tokenize() {
-  while (isWhitespace()) {
+  while (isWhitespace()) [[likely]] {
     nextChar();
   }
 
-  if (isEndOfFile()) {
+  if (isEndOfFile()) [[unlikely]] {
     if (_end) {
       return {TokenTypes::END};
     }
@@ -56,7 +56,7 @@ Token Lexer::tokenize() {
     return {TokenTypes::END_OF_FILE};
   }
 
-  if (isSeparator()) {
+  if (isSeparator()) [[likely]] {
 
     char c = current();
     nextChar();
@@ -76,7 +76,7 @@ Token Lexer::tokenize() {
     }
   }
 
-  if (isString()) {
+  if (isString()) [[likely]] {
     std::string buffer;
     buffer.reserve(64);
 
@@ -104,7 +104,7 @@ Token Lexer::tokenize() {
     return {TokenTypes::STRING, std::move(buffer)};
   }
 
-  if (isNumber()) {
+  if (isNumber()) [[likely]] {
     std::string buffer;
     buffer.reserve(16);
     bool error = false;
@@ -120,7 +120,7 @@ Token Lexer::tokenize() {
       buffer.push_back(current());
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
-      if (isDigit()) {
+      if (isDigit()) [[unlikely]] {
         error = true;
       }
     } else {
@@ -144,7 +144,7 @@ Token Lexer::tokenize() {
     }
 
     // if the number if exponent, we need to treat that.
-    if (isNumberExponentComponent()) {
+    if (isNumberExponentComponent()) [[unlikely]] {
 
       buffer.push_back(current());
       nextChar();
@@ -155,7 +155,7 @@ Token Lexer::tokenize() {
       }
 
       // validate that we have at least 1 digit after the exponent.
-      if (!isDigit()) {
+      if (!isDigit()) [[unlikely]] {
         error = true;
       }
       while (isDigit()) {
@@ -165,17 +165,17 @@ Token Lexer::tokenize() {
       }
     }
 
-    if (current() == '.') {
+    if (current() == '.') [[unlikely]] {
       error = true;
     }
-    if (error) {
+    if (error) [[unlikely]] {
       return {TokenTypes::ILLEGAL, std::move(buffer)};
     }
     // nextChar();
     return {TokenTypes::NUMBER, std::move(buffer)};
   }
 
-  if (isLiteral()) {
+  if (isLiteral()) [[likely]] {
     std::string_view expected_literal;
     if (current() == 'f') {
       expected_literal = "false";

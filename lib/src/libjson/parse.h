@@ -4,6 +4,8 @@
 #include "token.h"
 namespace libjson {
 
+enum JsonParseFlags { NONE, ALLOW_TRAILING_COMMA };
+
 JsonValue parse(std::istream &stream);
 JsonObject parseObject(Lexer &lexer);
 JsonValue parseValue(Lexer &lexer);

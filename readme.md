@@ -46,11 +46,15 @@ build `release` like above, then
 ```
 
 ```
-------------------------------------------------------------------------
-Benchmark                              Time             CPU   Iterations
-------------------------------------------------------------------------
-MB_Lexer_data/large-file.json   18238794 ns     17423223 ns           40
-MB_Parse_data/large-file.json  134794042 ns    128762562 ns            4
+--------------------------------------------------------------------
+Benchmark                          Time             CPU   Iterations
+--------------------------------------------------------------------
+lexerdata/large-file.json   64530724 ns     66304943 ns           10
+data/large-file.json       167962598 ns    172580949 ns            4
+lexerdata/00.json           27831800 ns     28597147 ns           24
+data/00.json                88750823 ns     91192360 ns            7
+JsonGetNumber_                  28.0 ns         28.7 ns     24506028
+JsonGetObject_                   109 ns          112 ns      6333009
 ```
 
 ## Todo
