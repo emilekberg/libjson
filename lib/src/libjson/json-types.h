@@ -21,6 +21,7 @@ enum class ValueType {
   ARRAY,
   BOOL,
 };
+
 //--------------------
 // basic types
 // - string

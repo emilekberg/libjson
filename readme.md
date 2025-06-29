@@ -8,7 +8,16 @@ The purpose of this was for me to try writing a lexer and parser, rather than so
 
 Lexer expects an `std::istream`. Lexer parses lazy and returns a `Token_EndOfFile` when reaching end of file, and beyond that will return a `Token_End`.
 
-It evaluates numbers from strings when you requrest it so take note of that. This is tradeoff for sake of supporting more arithmetic types.
+Values are stored as: 
+| libjson     | std                                          |
+|-------------|----------------------------------------------|
+| JsonString  | std::string                                  |
+| JsonNumber  | std::int64_t,double                          |
+| JsonArray   |  std::vector<JsonValue>                      |
+| JsonObject  | std::unoredered_map<std::string, JsonValue>  |
+| JsonBool    | bool                                         |
+| JsonNull    | nullptr, nullptr_t                           |
+
 
 ## How to 
 
