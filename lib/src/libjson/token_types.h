@@ -4,10 +4,10 @@ namespace libjson {
 enum class TokenTypes {
   HEAD, // used for beginning, maybe
   // SEPARATOR, // {}[],:
-  LEFT_BRACE,
-  RIGHT_BRACE,
-  LEFT_BRACKET,
-  RIGHT_BRACKET,
+  CURLY_BRACE_OPEN,
+  CURLY_BRACE_CLOSE,
+  SQUARE_BRACKET_OPEN,
+  SQUARE_BRACKET_CLOSE,
   COMMA,
   COLON,
   STRING,      // "someString" or "you can \"escape\" values" or 'single fnutts'

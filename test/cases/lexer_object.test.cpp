@@ -4,9 +4,11 @@
 using namespace libjson;
 TEST(Lexer, object_with_key) {
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::LEFT_BRACE},  {TokenTypes::STRING, "key"},
-      {TokenTypes::COLON},       {TokenTypes::STRING, "value"},
-      {TokenTypes::RIGHT_BRACE},
+      {TokenTypes::CURLY_BRACE_OPEN},
+      {TokenTypes::STRING, "key"},
+      {TokenTypes::COLON},
+      {TokenTypes::STRING, "value"},
+      {TokenTypes::CURLY_BRACE_CLOSE},
   };
   std::istringstream input(R"({"key":"value"})");
   libjson::Lexer lexer(input);
@@ -31,12 +33,18 @@ TEST(Lexer, object_with_key) {
 
 TEST(Lexer, object_with_number_array) {
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::LEFT_BRACE},    {TokenTypes::STRING, "numbers"},
-      {TokenTypes::COLON},         {TokenTypes::LEFT_BRACKET},
-      {TokenTypes::NUMBER, "1"},   {TokenTypes::COMMA},
-      {TokenTypes::NUMBER, "2"},   {TokenTypes::COMMA},
-      {TokenTypes::NUMBER, "3"},   {TokenTypes::COMMA},
-      {TokenTypes::RIGHT_BRACKET}, {TokenTypes::RIGHT_BRACE},
+      {TokenTypes::CURLY_BRACE_OPEN},
+      {TokenTypes::STRING, "numbers"},
+      {TokenTypes::COLON},
+      {TokenTypes::SQUARE_BRACKET_OPEN},
+      {TokenTypes::NUMBER, "1"},
+      {TokenTypes::COMMA},
+      {TokenTypes::NUMBER, "2"},
+      {TokenTypes::COMMA},
+      {TokenTypes::NUMBER, "3"},
+      {TokenTypes::COMMA},
+      {TokenTypes::SQUARE_BRACKET_CLOSE},
+      {TokenTypes::CURLY_BRACE_CLOSE},
   };
   std::istringstream input(R"({"numbers":[1, 2, 3,]})");
   libjson::Lexer lexer(input);

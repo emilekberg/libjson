@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include <libjson/exceptions.h>
 #include <libjson/lexer.h>
 
 TEST(Lexer, number) {
@@ -43,7 +44,8 @@ TEST(Lexer, number_invalid_if_multiple_dots) {
   std::istringstream input(R"(142.12.152 )");
 
   libjson::Lexer lexer(input);
-  libjson::Token t = lexer.next();
 
-  EXPECT_EQ(t.type, libjson::TokenTypes::ILLEGAL);
+  EXPECT_THROW(lexer.next(), libjson::unexpected_token);
+  // libjson::Token t = lexer.next();
+  // EXPECT_EQ(t.type, libjson::TokenTypes::ILLEGAL);
 }

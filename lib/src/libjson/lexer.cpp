@@ -1,12 +1,13 @@
 #include "lexer.h"
+#include "libjson/exceptions.h"
 #include "libjson/token_types.h"
 #include <iostream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 
 namespace libjson {
 Lexer::Lexer(std::istream &stream) : _stream(stream), _buffer{} {
-  // todo
   fillbuffer();
 }
 void Lexer::fillbuffer() {
@@ -62,13 +63,13 @@ Token Lexer::tokenize() {
     nextChar();
     switch (c) {
     case '{':
-      return {TokenTypes::LEFT_BRACE};
+      return {TokenTypes::CURLY_BRACE_OPEN};
     case '}':
-      return {TokenTypes::RIGHT_BRACE};
+      return {TokenTypes::CURLY_BRACE_CLOSE};
     case '[':
-      return {TokenTypes::LEFT_BRACKET};
+      return {TokenTypes::SQUARE_BRACKET_OPEN};
     case ']':
-      return {TokenTypes::RIGHT_BRACKET};
+      return {TokenTypes::SQUARE_BRACKET_CLOSE};
     case ',':
       return {TokenTypes::COMMA};
     case ':':
@@ -107,7 +108,6 @@ Token Lexer::tokenize() {
   if (isNumber()) [[likely]] {
     std::string buffer;
     buffer.reserve(16);
-    bool error = false;
     // can only contain one minus and it has to be leading.
     if (current() == '-') {
       buffer.push_back(current());
@@ -121,7 +121,8 @@ Token Lexer::tokenize() {
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) [[unlikely]] {
-        error = true;
+        throw unexpected_token(
+            "Lexer: Unexpected 0, number cannot start with two 0's");
       }
     } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
@@ -156,7 +157,7 @@ Token Lexer::tokenize() {
 
       // validate that we have at least 1 digit after the exponent.
       if (!isDigit()) [[unlikely]] {
-        error = true;
+        throw unexpected_token("Lexer: missing digit in exponent number");
       }
       while (isDigit()) {
 
@@ -166,10 +167,8 @@ Token Lexer::tokenize() {
     }
 
     if (current() == '.') [[unlikely]] {
-      error = true;
-    }
-    if (error) [[unlikely]] {
-      return {TokenTypes::ILLEGAL, std::move(buffer)};
+      throw unexpected_token(
+          "Lexer: number cannot contain more than one .(dot)");
     }
     // nextChar();
     return {TokenTypes::NUMBER, std::move(buffer)};
@@ -186,13 +185,15 @@ Token Lexer::tokenize() {
     }
     for (const char &c : expected_literal) {
       if (current() != c) {
-        return {TokenTypes::ILLEGAL};
+        throw unexpected_token(
+            "Lexer: expected literal(true,false,null) but got something else");
       }
       nextChar();
     }
     return {TokenTypes::LITERAL, std::string(expected_literal)};
   }
 
+  throw unexpected_token("Lexer: unknown token");
   return {TokenTypes::ILLEGAL};
 }
 

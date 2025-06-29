@@ -11,6 +11,8 @@ private:
   std::string message;
 
 public:
+  unexpected_token(const std::string &msg) : message(msg) {}
+
   unexpected_token(const std::string &got, const std::string &expected)
       : message(std::format("Expected {}, but got {}", expected, got)) {}
 

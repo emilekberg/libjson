@@ -44,17 +44,17 @@ public:
 private:
   inline Token tokenize();
   inline void nextChar();
-  inline const char current() const;
+  [[nodiscard]] inline const char current() const;
   inline void fillbuffer();
 
-  inline bool isWhitespace() const;
-  inline bool isSeparator() const;
-  inline bool isString() const;
-  inline bool isNumber() const;
-  inline bool isLiteral() const;
-  inline bool isDigit() const;
-  inline bool isNumberExponentComponent() const;
-  inline bool isEndOfFile() const;
+  [[nodiscard]] inline bool isWhitespace() const;
+  [[nodiscard]] inline bool isSeparator() const;
+  [[nodiscard]] inline bool isString() const;
+  [[nodiscard]] inline bool isNumber() const;
+  [[nodiscard]] inline bool isLiteral() const;
+  [[nodiscard]] inline bool isDigit() const;
+  [[nodiscard]] inline bool isNumberExponentComponent() const;
+  [[nodiscard]] inline bool isEndOfFile() const;
 
   std::istream &_stream;
   std::array<char, 512> _buffer;

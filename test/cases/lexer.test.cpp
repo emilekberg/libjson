@@ -43,7 +43,7 @@ TEST(Lexer, string_escape_edgecase) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::LEFT_BRACE},
+      {TokenTypes::CURLY_BRACE_OPEN},
       {TokenTypes::STRING, "message"},
       {TokenTypes::COLON},
       {TokenTypes::STRING, "simpler non-flash version\\\\"},
@@ -51,7 +51,7 @@ TEST(Lexer, string_escape_edgecase) {
       {TokenTypes::STRING, "distinct"},
       {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
-      {TokenTypes::RIGHT_BRACE},
+      {TokenTypes::CURLY_BRACE_CLOSE},
       {TokenTypes::END_OF_FILE, "\0"}};
   std::vector<libjson::Token> actual_tokens;
 
@@ -82,7 +82,7 @@ TEST(Lexer, trailing_comma) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::LEFT_BRACE},
+      {TokenTypes::CURLY_BRACE_OPEN},
       {TokenTypes::STRING, "public"},
       {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
@@ -91,7 +91,7 @@ TEST(Lexer, trailing_comma) {
       {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
       {TokenTypes::COMMA},
-      {TokenTypes::RIGHT_BRACE},
+      {TokenTypes::CURLY_BRACE_CLOSE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   std::vector<libjson::Token> actual_tokens;
@@ -122,7 +122,7 @@ TEST(Lexer, iterator) {
 })");
 
   std::vector<libjson::Token> expected_tokens = {
-      {TokenTypes::LEFT_BRACE},
+      {TokenTypes::CURLY_BRACE_OPEN},
       {TokenTypes::STRING, "public"},
       {TokenTypes::COLON},
       {TokenTypes::LITERAL, "true"},
@@ -131,7 +131,7 @@ TEST(Lexer, iterator) {
       {TokenTypes::COLON},
       {TokenTypes::STRING, "2015-01-01T15:00:00Z"},
       {TokenTypes::COMMA},
-      {TokenTypes::RIGHT_BRACE},
+      {TokenTypes::CURLY_BRACE_CLOSE},
       {TokenTypes::END_OF_FILE, "\0"}};
 
   size_t count = 0;

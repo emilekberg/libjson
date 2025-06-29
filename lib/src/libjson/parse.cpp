@@ -96,10 +96,10 @@ JsonValue parseValue(Lexer &lexer) {
   case TokenTypes::LITERAL:
     return parseLiteral(token);
 
-  case TokenTypes::LEFT_BRACE:
+  case TokenTypes::CURLY_BRACE_OPEN:
     return {parseObject(lexer)};
 
-  case TokenTypes::LEFT_BRACKET:
+  case TokenTypes::SQUARE_BRACKET_OPEN:
     return {parseArray(lexer)};
 
   case TokenTypes::ILLEGAL:
@@ -111,8 +111,8 @@ JsonValue parseValue(Lexer &lexer) {
   case TokenTypes::HEAD:
   case TokenTypes::END:
     throw unexpected_token(token.literal, "Not HEAD or END Token");
-  case TokenTypes::RIGHT_BRACE:
-  case TokenTypes::RIGHT_BRACKET:
+  case TokenTypes::SQUARE_BRACKET_CLOSE:
+  case TokenTypes::CURLY_BRACE_CLOSE:
   case TokenTypes::COMMA:
   case TokenTypes::COLON:
     throw unexpected_token(token.literal, "Unexpected Separator");
