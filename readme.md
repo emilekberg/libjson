@@ -49,12 +49,12 @@ build `release` like above, then
 --------------------------------------------------------------------
 Benchmark                          Time             CPU   Iterations
 --------------------------------------------------------------------
-lexerdata/large-file.json   64530724 ns     66304943 ns           10
-data/large-file.json       167962598 ns    172580949 ns            4
-lexerdata/00.json           27831800 ns     28597147 ns           24
-data/00.json                88750823 ns     91192360 ns            7
-JsonGetNumber_                  28.0 ns         28.7 ns     24506028
-JsonGetObject_                   109 ns          112 ns      6333009
+lexerdata/large-file.json       66.4 ms         64.6 ms           10
+data/large-file.json             173 ms          169 ms            4
+lexerdata/00.json               29.2 ms         28.4 ms           25
+data/00.json                    92.5 ms         90.1 ms            8
+JsonGetNumber_                 0.000 ms        0.000 ms     24703439
+JsonGetObject_                 0.000 ms        0.000 ms      6396276
 ```
 
 ## Todo

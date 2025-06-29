@@ -43,20 +43,28 @@ class JsonArray;
 //--------------------
 class JsonNumber {
 public:
-  JsonNumber(const std::string &literal) : _literal(literal) {}
+  JsonNumber(const std::string &literal) {
 
-  template <libjson::concepts::Numeric T> T get() const {
-    T value;
-    auto result = std::from_chars(_literal.data(),
-                                  _literal.data() + _literal.size(), value);
+    auto result =
+        std::from_chars(literal.data(), literal.data() + literal.size(), _int);
+
     if (result.ec != std::errc{}) {
-      throw std::invalid_argument("Invalid integer: " + _literal);
+      throw std::invalid_argument("Invalid integer: " + literal);
     }
-    return value;
+    result = std::from_chars(literal.data(), literal.data() + literal.size(),
+                             _double);
+    if (result.ec != std::errc{}) {
+      throw std::invalid_argument("Invalid double: " + literal);
+    }
   }
 
+  template <concepts::Int T> T get() const { return static_cast<T>(_int); }
+  template <concepts::Float T> T get() const { return static_cast<T>(_double); }
+
 private:
-  std::string _literal;
+  int64_t _int;
+  double _double;
+  // std::string _literal;
 };
 
 // json value needs to store JsonObject and JsonArray in shared_ptr to know the
