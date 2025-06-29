@@ -64,7 +64,6 @@ public:
 private:
   int64_t _int;
   double _double;
-  // std::string _literal;
 };
 
 // json value needs to store JsonObject and JsonArray in shared_ptr to know the
