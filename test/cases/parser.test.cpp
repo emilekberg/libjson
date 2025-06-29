@@ -4,72 +4,72 @@
 
 using namespace libjson;
 TEST(Parser, parses_object_one_key) {
-  std::istringstream input(R"({"key":"value"})");
-  libjson::JsonValue val = libjson::parse(input);
+   std::istringstream input(R"({"key":"value"})");
+   libjson::JsonValue val = libjson::parse(input);
 
-  libjson::JsonObject result = val.get<libjson::JsonObject>();
-  ASSERT_TRUE(result.has("key"));
+   libjson::JsonObject result = val.get<libjson::JsonObject>();
+   ASSERT_TRUE(result.has("key"));
 
-  JsonValue value = result.get<JsonValue>("key");
-  EXPECT_EQ(value.getType(), libjson::ValueType::STRING);
-  EXPECT_EQ(value.get<std::string>(), "value");
-  EXPECT_EQ(result.get<JsonString>("key"), "value");
+   JsonValue value = result.get<JsonValue>("key");
+   EXPECT_EQ(value.getType(), libjson::ValueType::STRING);
+   EXPECT_EQ(value.get<std::string>(), "value");
+   EXPECT_EQ(result.get<JsonString>("key"), "value");
 }
 
 TEST(Parser, parses_object_two_keys) {
-  std::istringstream input(R"({"a":"first","b":"second"})");
-  JsonValue val = libjson::parse(input);
+   std::istringstream input(R"({"a":"first","b":"second"})");
+   JsonValue          val = libjson::parse(input);
 
-  JsonObject result = val.get<libjson::JsonObject>();
-  ASSERT_TRUE(result.has("a"));
-  ASSERT_TRUE(result.has("b"));
+   JsonObject result = val.get<libjson::JsonObject>();
+   ASSERT_TRUE(result.has("a"));
+   ASSERT_TRUE(result.has("b"));
 
-  JsonValue valueA = result.get<JsonValue>("a");
-  EXPECT_EQ(valueA.getType(), ValueType::STRING);
-  EXPECT_EQ(result.get<std::string>("a"), "first");
+   JsonValue valueA = result.get<JsonValue>("a");
+   EXPECT_EQ(valueA.getType(), ValueType::STRING);
+   EXPECT_EQ(result.get<std::string>("a"), "first");
 
-  libjson::JsonValue valueB = result.get<JsonValue>("b");
-  EXPECT_EQ(valueB.getType(), ValueType::STRING);
-  EXPECT_EQ(result.get<std::string>("b"), "second");
-  EXPECT_EQ(result.get<std::string>("b"), "second");
+   libjson::JsonValue valueB = result.get<JsonValue>("b");
+   EXPECT_EQ(valueB.getType(), ValueType::STRING);
+   EXPECT_EQ(result.get<std::string>("b"), "second");
+   EXPECT_EQ(result.get<std::string>("b"), "second");
 }
 
 TEST(Parser, parses_object_with_object) {
 
-  std::istringstream input(R"({"root":{"branch":"deep value"}})");
-  libjson::JsonValue val = libjson::parse(input);
+   std::istringstream input(R"({"root":{"branch":"deep value"}})");
+   libjson::JsonValue val = libjson::parse(input);
 
-  libjson::JsonObject result = val.get<libjson::JsonObject>();
-  ASSERT_TRUE(result.has("root"));
+   libjson::JsonObject result = val.get<libjson::JsonObject>();
+   ASSERT_TRUE(result.has("root"));
 
-  libjson::JsonValue rootValue = result.get<JsonValue>("root");
-  auto root = rootValue.get<libjson::JsonObject>();
-  ASSERT_TRUE(root.has("branch"));
+   libjson::JsonValue rootValue = result.get<JsonValue>("root");
+   auto               root      = rootValue.get<libjson::JsonObject>();
+   ASSERT_TRUE(root.has("branch"));
 
-  libjson::JsonValue branchValue = root.get<JsonValue>("branch");
-  std::string branchstr = root.get<JsonString>("branch");
-  EXPECT_EQ(branchValue.getType(), ValueType::STRING);
-  EXPECT_EQ(branchstr, "deep value");
+   libjson::JsonValue branchValue = root.get<JsonValue>("branch");
+   std::string        branchstr   = root.get<JsonString>("branch");
+   EXPECT_EQ(branchValue.getType(), ValueType::STRING);
+   EXPECT_EQ(branchstr, "deep value");
 }
 
 TEST(Parser, parses_array_with_values) {
-  std::istringstream input(R"([{"a":1},{"a":2},{"a":3}])");
-  std::vector<double> expected_arr = {1, 2, 3};
-  libjson::JsonValue value = libjson::parse(input);
+   std::istringstream  input(R"([{"a":1},{"a":2},{"a":3}])");
+   std::vector<double> expected_arr = {1, 2, 3};
+   libjson::JsonValue  value        = libjson::parse(input);
 
-  ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
-  libjson::JsonArray array = value.get<libjson::JsonArray>();
-  ASSERT_EQ(array.size(), expected_arr.size());
+   ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
+   libjson::JsonArray array = value.get<libjson::JsonArray>();
+   ASSERT_EQ(array.size(), expected_arr.size());
 
-  for (size_t i = 0; i < array.size(); i++) {
-    int expected = expected_arr[i];
-    int actual = array.get<JsonObject>(i).get<int>("a");
-    EXPECT_EQ(actual, expected);
-  }
+   for (size_t i = 0; i < array.size(); i++) {
+      int expected = expected_arr[i];
+      int actual   = array.get<JsonObject>(i).get<int>("a");
+      EXPECT_EQ(actual, expected);
+   }
 }
 
 TEST(Parser, objects_with_trailing_comma) {
-  std::istringstream json(R"({
+   std::istringstream json(R"({
     "id": "2489651045",
     "actor": {
         "id": 665991,
@@ -90,6 +90,6 @@ TEST(Parser, objects_with_trailing_comma) {
     "public": true,
     "created_at": "2015-01-01T15:00:00Z",
 })");
-  JsonValue value = parse(json);
-  EXPECT_EQ(value.getType(), ValueType::OBJECT);
+   JsonValue          value = parse(json);
+   EXPECT_EQ(value.getType(), ValueType::OBJECT);
 }

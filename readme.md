@@ -73,17 +73,6 @@ JsonGetObject_                 0.000 ms        0.000 ms      6396276
 - [ ] support both `std::string_view` and `std::istream`.
   - I expect `std::string_view` to be faster, but require more memory ahead of time.
 
-## Features
-
-- Arrays
-- Objects
-- Strings
-- Literals
-  - bool, both true/false
-  - null
-- Numbers
-  - Lazy evaluated, might not be the fastest, but takes less memory and supports all (i think) arithmeitc types. 
-
 ### Caveats
 
 - Does not support number exponents yet

@@ -3,65 +3,65 @@
 #include <libjson/parse.h>
 
 TEST(parse, value_string) {
-  std::istringstream input(R"("someString")");
-  libjson::Lexer lexer(input);
-  libjson::JsonValue value = libjson::parseValue(lexer);
+   std::istringstream input(R"("someString")");
+   libjson::Lexer     lexer(input);
+   libjson::JsonValue value = libjson::parseValue(lexer);
 
-  EXPECT_EQ(value.getType(), libjson::ValueType::STRING);
-  EXPECT_EQ(value.get<std::string>(), "someString");
+   EXPECT_EQ(value.getType(), libjson::ValueType::STRING);
+   EXPECT_EQ(value.get<std::string>(), "someString");
 }
 
 TEST(parse, value_double) {
-  std::istringstream input(R"(1234.56 )");
-  libjson::Lexer lexer(input);
-  libjson::JsonValue value = libjson::parseValue(lexer);
+   std::istringstream input(R"(1234.56 )");
+   libjson::Lexer     lexer(input);
+   libjson::JsonValue value = libjson::parseValue(lexer);
 
-  EXPECT_EQ(value.getType(), libjson::ValueType::NUMBER);
-  EXPECT_EQ(value.get<double>(), 1234.56);
+   EXPECT_EQ(value.getType(), libjson::ValueType::NUMBER);
+   EXPECT_EQ(value.get<double>(), 1234.56);
 }
 
 TEST(parse, value_literal_true) {
-  std::istringstream input(R"(true)");
-  libjson::Lexer lexer(input);
-  libjson::JsonValue value = libjson::parseValue(lexer);
+   std::istringstream input(R"(true)");
+   libjson::Lexer     lexer(input);
+   libjson::JsonValue value = libjson::parseValue(lexer);
 
-  EXPECT_EQ(value.getType(), libjson::ValueType::BOOL);
-  EXPECT_TRUE(value.get<bool>());
+   EXPECT_EQ(value.getType(), libjson::ValueType::BOOL);
+   EXPECT_TRUE(value.get<bool>());
 }
 
 TEST(parse, value_literal_false) {
-  std::istringstream input(R"(false)");
-  libjson::Lexer lexer(input);
-  libjson::JsonValue value = libjson::parseValue(lexer);
+   std::istringstream input(R"(false)");
+   libjson::Lexer     lexer(input);
+   libjson::JsonValue value = libjson::parseValue(lexer);
 
-  EXPECT_EQ(value.getType(), libjson::ValueType::BOOL);
-  EXPECT_FALSE(value.get<bool>());
+   EXPECT_EQ(value.getType(), libjson::ValueType::BOOL);
+   EXPECT_FALSE(value.get<bool>());
 }
 
 TEST(parse, value_literal_null) {
-  std::istringstream input(R"(null)");
-  libjson::Lexer lexer(input);
-  libjson::JsonValue value = libjson::parseValue(lexer);
+   std::istringstream input(R"(null)");
+   libjson::Lexer     lexer(input);
+   libjson::JsonValue value = libjson::parseValue(lexer);
 
-  EXPECT_EQ(value.getType(), libjson::ValueType::_NULL_);
-  EXPECT_EQ(value.get<libjson::JsonNull>(), nullptr);
+   EXPECT_EQ(value.getType(), libjson::ValueType::_NULL_);
+   EXPECT_EQ(value.get<libjson::JsonNull>(), nullptr);
 }
 
 TEST(Parse, object_empty_object) {
-  std::istringstream input(R"({})");
+   std::istringstream input(R"({})");
 
-  libjson::JsonValue value = libjson::parse(input);
-  ASSERT_EQ(value.getType(), libjson::ValueType::OBJECT);
+   libjson::JsonValue value = libjson::parse(input);
+   ASSERT_EQ(value.getType(), libjson::ValueType::OBJECT);
 
-  libjson::JsonObject object = value.get<libjson::JsonObject>();
-  ASSERT_EQ(object.size(), 0);
+   libjson::JsonObject object = value.get<libjson::JsonObject>();
+   ASSERT_EQ(object.size(), 0);
 }
 
 TEST(parse, array_empty_array) {
-  std::istringstream input(R"([])");
-  libjson::JsonValue value = libjson::parse(input);
-  ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
+   std::istringstream input(R"([])");
+   libjson::JsonValue value = libjson::parse(input);
+   ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
 
-  libjson::JsonArray array = value.get<libjson::JsonArray>();
-  ASSERT_EQ(array.size(), 0);
+   libjson::JsonArray array = value.get<libjson::JsonArray>();
+   ASSERT_EQ(array.size(), 0);
 }
