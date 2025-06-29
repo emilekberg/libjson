@@ -9,9 +9,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 add_subdirectory(lib)
 
 
-# if(BUILD_TESTING)
+if(BUILD_TESTING)
 	add_subdirectory(benchmark)
-# endif()
+endif()
 include(CTest) 
 if(BUILD_TESTING)
 	add_subdirectory(playground)
