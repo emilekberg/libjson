@@ -95,69 +95,139 @@ Token Lexer::lexSeparator() {
    throw unexpected_token("Lexer: unexpected separator.");
 }
 
+enum class NumberState {
+   Start,
+   Negative,
+   Zero,
+   Integer,
+   Dot,
+   Fraction,
+   ExpStart,
+   ExpSign,
+   Exp,
+   Done
+};
+
 Token Lexer::lexNumber() {
    std::string result;
-   result.reserve(16);
-   // can only contain one minus and it has to be leading.
-   if (current() == '-') {
-      result.push_back(current());
-      nextChar();
-   }
+   NumberState state = NumberState::Start;
+   while (state != NumberState::Done) {
+      switch (state) {
+      case NumberState::Start: {
+         if (current() == '-') {
+            state = NumberState::Negative;
+         } else if (current() == '0') {
+            state = NumberState::Zero;
+         } else {
+            state = NumberState::Integer;
+         }
+      } break;
 
-   // 0 can only be first, or fraction.
-   if (current() == '0') {
-
-      result.push_back(current());
-      nextChar();
-      // if we encounter a 0, then a digit, it's invalid.
-      if (isDigit()) [[unlikely]] {
-         throw unexpected_token("Lexer: Digits cannot start with 0, then a digit, such as 014");
-      }
-   } else {
-      // if we didn't encounter a zero, proceed looking at the following numbers
-      while (isDigit()) {
+      case NumberState::Negative: {
          result.push_back(current());
          nextChar();
-      }
-   }
+         if (_buffer[_bufferPosition] == '0')
+            state = NumberState::Zero;
+         else
+            state = NumberState::Integer;
+      } break;
 
-   // if we encounter a dot, process all numbers succeeding it.
-   if (current() == '.') {
-
-      result.push_back(current());
-      nextChar();
-      while (isDigit()) {
+      case NumberState::Zero: {
          result.push_back(current());
          nextChar();
-      }
-   }
+         if (current() == '.') {
+            state = NumberState::Dot;
+         } else if (isDigit()) {
+            throw unexpected_token("cannot have leading zeroes");
+         } else {
+            state = NumberState::Done;
+         }
+      } break;
 
-   // if the number if exponent, we need to treat that.
-   if (isNumberExponentComponent()) [[unlikely]] {
+      case NumberState::Integer: {
+         while (isDigit()) {
+            appendSpan(result, [](char c) { return c >= '0' && c <= '9'; });
+         }
+         if (current() == '.') {
+            state = NumberState::Dot;
+         } else if (current() == 'e' || current() == 'E') {
+            state = NumberState::ExpStart;
+         } else {
+            state = NumberState::Done;
+         }
+      } break;
 
-      result.push_back(current());
-      nextChar();
-      if ((current() == '+' || current() == '-')) {
-
+      case NumberState::Dot: {
          result.push_back(current());
          nextChar();
-      }
+         if (isDigit()) {
+            state = NumberState::Fraction;
+         } else {
+            throw unexpected_token("expected digit, but got some other shit");
+         }
+      } break;
 
-      // validate that we have at least 1 digit after the exponent.
-      if (!isDigit()) [[unlikely]] {
-         throw unexpected_token("Lexer: missing digit in exponent number");
-      }
-      while (isDigit()) {
+      case NumberState::Fraction: {
+         while (isDigit()) {
+            appendSpan(result, [](char c) { return c >= '0' && c <= '9'; });
+         }
+         if (current() == 'e' || current() == 'E') {
+            state = NumberState::ExpStart;
+         } else {
+            state = NumberState::Done;
+         }
+      } break;
 
+      case NumberState::ExpStart: {
          result.push_back(current());
          nextChar();
+         if (current() == '-') {
+            state = NumberState::ExpSign;
+         } else if (current() == '+') {
+            state = NumberState::ExpSign;
+         } else if (isDigit()) {
+            state = NumberState::Exp;
+         } else {
+            throw unexpected_token("expected digit, but got some other shit");
+         }
+      } break;
+
+      case NumberState::ExpSign: {
+         result.push_back(current());
+         nextChar();
+         if (isDigit()) {
+            state = NumberState::Exp;
+         } else {
+            throw unexpected_token("expected digit, but got some other shit");
+         }
+      } break;
+
+      case NumberState::Exp: {
+         while (isDigit()) {
+            appendSpan(result, [](char c) { return c >= '0' && c <= '9'; });
+            // appendDigits(result);
+         }
+         state = NumberState::Done;
+      } break;
+
+      case NumberState::Done:
+         break;
       }
    }
 
-   if (current() == '.') [[unlikely]] {
-      throw unexpected_token("Lexer: number cannot contain more than one .(dot)");
-   }
    return {TokenTypes::NUMBER, std::move(result)};
+}
+
+void Lexer::appendDigits(std::string &result) {
+   size_t start = _bufferPosition;
+   while (_bufferPosition < _bufferSize && _buffer[_bufferPosition] >= '0' &&
+          _buffer[_bufferPosition] <= '9') {
+      _bufferPosition++;
+   }
+   result.append(_buffer.data() + start, _bufferPosition - start);
+   if (_bufferPosition >= _bufferSize) [[unlikely]] {
+      fillbuffer();
+   }
 }
 
 Token Lexer::lexString() {
@@ -186,17 +256,7 @@ Token Lexer::lexString() {
             nextChar();
          }
       }
-
-      size_t start = _bufferPosition;
-      while (_bufferPosition < _bufferSize && _buffer[_bufferPosition] != '"' &&
-             _buffer[_bufferPosition] != '\\') {
-         _bufferPosition++;
-      }
-      result.append(_buffer.data() + start, _bufferPosition - start);
-
-      if (_bufferPosition >= _bufferSize) {
-         fillbuffer();
-      }
+      appendSpan(result, [](char c) { return c != '\\' && c != '"'; });
    }
    // skip the closing quote
    nextChar();

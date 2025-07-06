@@ -54,6 +54,18 @@ class Lexer {
    [[nodiscard]] inline const char current() const;
    void                            fillbuffer();
 
+   template <typename Predicate> void appendSpan(std::string &result, Predicate predicate) {
+      size_t start = _bufferPosition;
+      while (_bufferPosition < _bufferSize && predicate(_buffer[_bufferPosition])) {
+         _bufferPosition++;
+      }
+      result.append(_buffer.data() + start, _bufferPosition - start);
+      if (_bufferPosition >= _bufferSize) [[unlikely]] {
+         fillbuffer();
+      }
+   }
+   void appendDigits(std::string &result);
+
    [[nodiscard]] bool isWhitespace() const;
    [[nodiscard]] bool isSeparator() const;
    [[nodiscard]] bool isString() const;
