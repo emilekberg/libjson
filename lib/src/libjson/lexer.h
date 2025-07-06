@@ -71,9 +71,9 @@ class Lexer {
    Token lexLiteral();
 
    std::istream          &_stream;
-   std::array<char, 2048> _buffer;
-   size_t                 _buffer_position;
-   size_t                 _buffer_length;
+   std::array<char, 4096> _buffer;
+   size_t                 _bufferPosition;
+   size_t                 _bufferSize;
    bool                   _end = false;
    std::optional<Token>   _next;
 };

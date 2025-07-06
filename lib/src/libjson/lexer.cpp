@@ -11,21 +11,21 @@ Lexer::Lexer(std::istream &stream) : _stream(stream), _buffer{} {
 }
 void Lexer::fillbuffer() {
    _stream.read(_buffer.data(), sizeof(_buffer));
-   _buffer_length   = _stream.gcount();
-   _buffer_position = 0;
+   _bufferSize     = _stream.gcount();
+   _bufferPosition = 0;
 }
 void Lexer::nextChar() {
-   _buffer_position++;
-   if (_buffer_position >= _buffer_length) {
+   _bufferPosition++;
+   if (_bufferPosition >= _bufferSize) {
       fillbuffer();
    }
    // std::cout << current() << std::endl;
 }
 const char Lexer::current() const {
-   if (_buffer_position >= _buffer_length) {
+   if (_bufferPosition >= _bufferSize) {
       return '\0';
    }
-   return _buffer[_buffer_position];
+   return _buffer[_bufferPosition];
 }
 
 Token Lexer::peek() {
@@ -96,27 +96,27 @@ Token Lexer::lexSeparator() {
 }
 
 Token Lexer::lexNumber() {
-   std::string buffer;
-   buffer.reserve(16);
+   std::string result;
+   result.reserve(16);
    // can only contain one minus and it has to be leading.
    if (current() == '-') {
-      buffer.push_back(current());
+      result.push_back(current());
       nextChar();
    }
 
    // 0 can only be first, or fraction.
    if (current() == '0') {
 
-      buffer.push_back(current());
+      result.push_back(current());
       nextChar();
       // if we encounter a 0, then a digit, it's invalid.
       if (isDigit()) [[unlikely]] {
-         throw unexpected_token("Lexer: Unexpected 0, number cannot start with two 0's");
+         throw unexpected_token("Lexer: Digits cannot start with 0, then a digit, such as 014");
       }
    } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
       while (isDigit()) {
-         buffer.push_back(current());
+         result.push_back(current());
          nextChar();
       }
    }
@@ -124,10 +124,10 @@ Token Lexer::lexNumber() {
    // if we encounter a dot, process all numbers succeeding it.
    if (current() == '.') {
 
-      buffer.push_back(current());
+      result.push_back(current());
       nextChar();
       while (isDigit()) {
-         buffer.push_back(current());
+         result.push_back(current());
          nextChar();
       }
    }
@@ -135,11 +135,11 @@ Token Lexer::lexNumber() {
    // if the number if exponent, we need to treat that.
    if (isNumberExponentComponent()) [[unlikely]] {
 
-      buffer.push_back(current());
+      result.push_back(current());
       nextChar();
       if ((current() == '+' || current() == '-')) {
 
-         buffer.push_back(current());
+         result.push_back(current());
          nextChar();
       }
 
@@ -149,7 +149,7 @@ Token Lexer::lexNumber() {
       }
       while (isDigit()) {
 
-         buffer.push_back(current());
+         result.push_back(current());
          nextChar();
       }
    }
@@ -157,12 +157,11 @@ Token Lexer::lexNumber() {
    if (current() == '.') [[unlikely]] {
       throw unexpected_token("Lexer: number cannot contain more than one .(dot)");
    }
-   return {TokenTypes::NUMBER, std::move(buffer)};
+   return {TokenTypes::NUMBER, std::move(result)};
 }
 
 Token Lexer::lexString() {
    std::string result;
-   result.reserve(64);
 
    // skip the opening quote
    nextChar();
@@ -186,21 +185,18 @@ Token Lexer::lexString() {
             result.push_back(current());
             nextChar();
          }
-      } else {
-         size_t start = _buffer_position;
-         while (_buffer_position < _buffer_length && _buffer[_buffer_position] != '"' &&
-                _buffer[_buffer_position] != '\\') {
-            _buffer_position++;
-         }
-         result.append(_buffer.data() + start, _buffer_position - start);
-         // std::cout << result << std::endl;
-         if (_buffer_position >= _buffer_length) {
-            fillbuffer();
-         }
       }
 
-      // buffer.push_back(current());
-      // nextChar();
+      size_t start = _bufferPosition;
+      while (_bufferPosition < _bufferSize && _buffer[_bufferPosition] != '"' &&
+             _buffer[_bufferPosition] != '\\') {
+         _bufferPosition++;
+      }
+      result.append(_buffer.data() + start, _bufferPosition - start);
+
+      if (_bufferPosition >= _bufferSize) {
+         fillbuffer();
+      }
    }
    // skip the closing quote
    nextChar();
@@ -230,7 +226,7 @@ bool Lexer::isWhitespace() const {
 }
 
 bool Lexer::isEndOfFile() const {
-   return _buffer_position >= _buffer_length && _stream.eof();
+   return _bufferPosition >= _bufferSize && _stream.eof();
 }
 
 bool Lexer::isNumber() const {
