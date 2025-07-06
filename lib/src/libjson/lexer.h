@@ -49,19 +49,26 @@ class Lexer {
    }
 
  private:
-   inline Token                    tokenize();
-   inline void                     nextChar();
+   Token                           tokenize();
+   void                            nextChar();
    [[nodiscard]] inline const char current() const;
-   inline void                     fillbuffer();
+   void                            fillbuffer();
 
-   [[nodiscard]] inline bool isWhitespace() const;
-   [[nodiscard]] inline bool isSeparator() const;
-   [[nodiscard]] inline bool isString() const;
-   [[nodiscard]] inline bool isNumber() const;
-   [[nodiscard]] inline bool isLiteral() const;
-   [[nodiscard]] inline bool isDigit() const;
-   [[nodiscard]] inline bool isNumberExponentComponent() const;
-   [[nodiscard]] inline bool isEndOfFile() const;
+   [[nodiscard]] bool isWhitespace() const;
+   [[nodiscard]] bool isSeparator() const;
+   [[nodiscard]] bool isString() const;
+   [[nodiscard]] bool isNumber() const;
+   [[nodiscard]] bool isLiteral() const;
+   [[nodiscard]] bool isDigit() const;
+   [[nodiscard]] bool isNumberExponentComponent() const;
+   [[nodiscard]] bool isAllowedEscapeChar() const;
+   [[nodiscard]] bool isEndOfFile() const;
+   [[nodiscard]] bool isHexDecimal() const;
+
+   Token lexSeparator();
+   Token lexNumber();
+   Token lexString();
+   Token lexLiteral();
 
    std::istream         &_stream;
    std::array<char, 512> _buffer;

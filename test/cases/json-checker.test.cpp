@@ -41,12 +41,10 @@ INSTANTIATE_TEST_SUITE_P(
         "fail13.json",
         "fail14.json",
 
-        // "fail15.json", // TODO: implement this, validates specific escapes
-
+        "fail15.json",
         "fail16.json",
 
-        // "fail17.json", // TODO: implement this, validate specific escape
-
+        "fail17.json",
         // "fail18.json", // TODO: verify if there is a limit on depth for json
 
         "fail19.json",
