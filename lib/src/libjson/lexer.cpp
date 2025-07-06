@@ -19,6 +19,7 @@ void Lexer::nextChar() {
    if (_buffer_position >= _buffer_length) {
       fillbuffer();
    }
+   // std::cout << current() << std::endl;
 }
 const char Lexer::current() const {
    if (_buffer_position >= _buffer_length) {
@@ -115,7 +116,6 @@ Token Lexer::lexNumber() {
    } else {
       // if we didn't encounter a zero, proceed looking at the following numbers
       while (isDigit()) {
-
          buffer.push_back(current());
          nextChar();
       }
@@ -157,48 +157,55 @@ Token Lexer::lexNumber() {
    if (current() == '.') [[unlikely]] {
       throw unexpected_token("Lexer: number cannot contain more than one .(dot)");
    }
-   // nextChar();
    return {TokenTypes::NUMBER, std::move(buffer)};
 }
 
 Token Lexer::lexString() {
-   std::string buffer;
-   buffer.reserve(64);
+   std::string result;
+   result.reserve(64);
 
-   // skip one
+   // skip the opening quote
    nextChar();
 
-   // search for the closing quote matching the entry one.
-   // if it's escaped, ignore it.
    while (!isString()) {
-      // if we stumble opon an escape sign, we do some skips.
       if (current() == '\\') {
-         buffer.push_back(current());
+         result.push_back(current());
          nextChar();
 
-         // TODO: we are now at the escaped sign.
-         // we need to verify what this is, or return invalid token.
          if (!isAllowedEscapeChar()) {
-            throw unexpected_token("got unexpected escaped character: " + current());
-         }
-
-         if (current() == 'u') {
+            throw unexpected_token(std::format("got unexpected escaped character: {}", current()));
+         } else if (current() == 'u') {
             for (size_t i = 0; i < 4; i++) {
-               buffer.push_back(current());
+               result.push_back(current());
                nextChar();
                if (!isHexDecimal()) {
-                  throw unexpected_token("got illegal hex number: " + current());
+                  throw unexpected_token(std::format("got illegal hex number: {}", current()));
                }
             }
+         } else {
+            result.push_back(current());
+            nextChar();
+         }
+      } else {
+         size_t start = _buffer_position;
+         while (_buffer_position < _buffer_length && _buffer[_buffer_position] != '"' &&
+                _buffer[_buffer_position] != '\\') {
+            _buffer_position++;
+         }
+         result.append(_buffer.data() + start, _buffer_position - start);
+         // std::cout << result << std::endl;
+         if (_buffer_position >= _buffer_length) {
+            fillbuffer();
          }
       }
 
-      buffer.push_back(current());
-      nextChar();
+      // buffer.push_back(current());
+      // nextChar();
    }
+   // skip the closing quote
    nextChar();
-
-   return {TokenTypes::STRING, std::move(buffer)};
+   // std::cout << result << std::endl;
+   return {TokenTypes::STRING, std::move(result)};
 }
 Token Lexer::lexLiteral() {
    std::string_view expected_literal;

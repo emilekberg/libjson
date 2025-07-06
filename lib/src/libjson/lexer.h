@@ -70,11 +70,11 @@ class Lexer {
    Token lexString();
    Token lexLiteral();
 
-   std::istream         &_stream;
-   std::array<char, 512> _buffer;
-   size_t                _buffer_position;
-   size_t                _buffer_length;
-   bool                  _end = false;
-   std::optional<Token>  _next;
+   std::istream          &_stream;
+   std::array<char, 2048> _buffer;
+   size_t                 _buffer_position;
+   size_t                 _buffer_length;
+   bool                   _end = false;
+   std::optional<Token>   _next;
 };
 } // namespace libjson
