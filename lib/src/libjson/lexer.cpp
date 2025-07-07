@@ -16,7 +16,7 @@ void Lexer::fillbuffer() {
 }
 void Lexer::nextChar() {
    _bufferPosition++;
-   if (_bufferPosition >= _bufferSize) {
+   if (_bufferPosition >= _bufferSize) [[unlikely]] {
       fillbuffer();
    }
    // std::cout << current() << std::endl;
@@ -56,6 +56,8 @@ Token Lexer::tokenize() {
       _end = true;
       return {TokenTypes::END_OF_FILE};
    }
+
+   //==SEPARATORS==//
 
    if (isSeparator()) [[likely]] {
       return lexSeparator();
@@ -173,6 +175,8 @@ Token Lexer::lexNumber() {
          }
          if (current() == 'e' || current() == 'E') {
             state = NumberState::ExpStart;
+         } else if (current() == '.') {
+            throw unexpected_token("Lexer: Number cannot have multiple dots");
          } else {
             state = NumberState::Done;
          }
@@ -205,7 +209,6 @@ Token Lexer::lexNumber() {
       case NumberState::Exp: {
          while (isDigit()) {
             appendSpan(result, [](char c) { return c >= '0' && c <= '9'; });
-            // appendDigits(result);
          }
          state = NumberState::Done;
       } break;
@@ -265,12 +268,16 @@ Token Lexer::lexString() {
 }
 Token Lexer::lexLiteral() {
    std::string_view expected_literal;
-   if (current() == 'f') {
+   switch (current()) {
+   case 'f': {
       expected_literal = "false";
-   } else if (current() == 't') {
+   } break;
+   case 't': {
       expected_literal = "true";
-   } else if (current() == 'n') {
+   } break;
+   case 'n': {
       expected_literal = "null";
+   } break;
    }
    for (const char &c : expected_literal) {
       if (current() != c) {
@@ -281,8 +288,7 @@ Token Lexer::lexLiteral() {
    return {TokenTypes::LITERAL, std::string(expected_literal)};
 }
 bool Lexer::isWhitespace() const {
-   char c = current();
-   return c == ' ' || c == '\t' || c == '\n' || c == '\r';
+   return whitespaceLUT[current()];
 }
 
 bool Lexer::isEndOfFile() const {

@@ -54,6 +54,7 @@ class Lexer {
    [[nodiscard]] inline const char current() const;
    void                            fillbuffer();
 
+   /// Appends from buffer while predicate is true.
    template <typename Predicate> void appendSpan(std::string &result, Predicate predicate) {
       size_t start = _bufferPosition;
       while (_bufferPosition < _bufferSize && predicate(_buffer[_bufferPosition])) {
@@ -88,5 +89,13 @@ class Lexer {
    size_t                 _bufferSize;
    bool                   _end = false;
    std::optional<Token>   _next;
+
+   const std::array<bool, 256> whitespaceLUT = [] {
+      std::array<bool, 256> table = {};
+      for (char c = 0; c < table.size(); ++c) {
+         table[c] = (c == ' ' || c == '\t' || c == '\n' || c == '\r');
+      }
+      return table;
+   }();
 };
 } // namespace libjson
