@@ -57,74 +57,61 @@ Token Lexer::tokenize() {
       return {TokenTypes::END_OF_FILE};
    }
 
-   //==SEPARATORS==//
-
-   if (isSeparator()) [[likely]] {
-      return lexSeparator();
-   }
-
-   if (isString()) [[likely]] {
-      return lexString();
-   }
-
-   if (isNumber()) [[likely]] {
-      return lexNumber();
-   }
-
-   if (isLiteral()) [[likely]] {
-      return lexLiteral();
-   }
-   throw unexpected_token("Lexer: unknown token");
-}
-Token Lexer::lexSeparator() {
-
-   char c = current();
-   nextChar();
-   switch (c) {
+   switch (current()) {
+   //== SEPARATORS ==//
    case '{':
+      nextChar();
       return {TokenTypes::CURLY_BRACE_OPEN};
    case '}':
+      nextChar();
       return {TokenTypes::CURLY_BRACE_CLOSE};
    case '[':
+      nextChar();
       return {TokenTypes::SQUARE_BRACKET_OPEN};
    case ']':
+      nextChar();
       return {TokenTypes::SQUARE_BRACKET_CLOSE};
    case ',':
+      nextChar();
       return {TokenTypes::COMMA};
    case ':':
+      nextChar();
       return {TokenTypes::COLON};
+
+   //== LITERAL ==//
+   case 'f':
+   case 't':
+   case 'n':
+      return lexLiteral();
+
+   //== STRING ==//
+   case '"':
+      return lexString();
+
+   //== NUMBERS ==//
+   case '-':
+      return lexNumber(NumberState::Negative);
+   case '0':
+      return lexNumber(NumberState::Zero);
+   case '1':
+   case '2':
+   case '3':
+   case '4':
+   case '5':
+   case '6':
+   case '7':
+   case '8':
+   case '9':
+      return lexNumber(NumberState::Integer);
+   default:
+      throw unexpected_token("Lexer: unknown token");
    }
-   throw unexpected_token("Lexer: unexpected separator.");
 }
 
-enum class NumberState {
-   Start,
-   Negative,
-   Zero,
-   Integer,
-   Dot,
-   Fraction,
-   ExpStart,
-   ExpSign,
-   Exp,
-   Done
-};
-
-Token Lexer::lexNumber() {
+Token Lexer::lexNumber(NumberState state) {
    std::string result;
-   NumberState state = NumberState::Start;
    while (state != NumberState::Done) {
       switch (state) {
-      case NumberState::Start: {
-         if (current() == '-') {
-            state = NumberState::Negative;
-         } else if (current() == '0') {
-            state = NumberState::Zero;
-         } else {
-            state = NumberState::Integer;
-         }
-      } break;
-
       case NumberState::Negative: {
          result.push_back(current());
          nextChar();
@@ -185,9 +172,7 @@ Token Lexer::lexNumber() {
       case NumberState::ExpStart: {
          result.push_back(current());
          nextChar();
-         if (current() == '-') {
-            state = NumberState::ExpSign;
-         } else if (current() == '+') {
+         if (current() == '-' || current() == '+') {
             state = NumberState::ExpSign;
          } else if (isDigit()) {
             state = NumberState::Exp;
@@ -219,18 +204,6 @@ Token Lexer::lexNumber() {
    }
 
    return {TokenTypes::NUMBER, std::move(result)};
-}
-
-void Lexer::appendDigits(std::string &result) {
-   size_t start = _bufferPosition;
-   while (_bufferPosition < _bufferSize && _buffer[_bufferPosition] >= '0' &&
-          _buffer[_bufferPosition] <= '9') {
-      _bufferPosition++;
-   }
-   result.append(_buffer.data() + start, _bufferPosition - start);
-   if (_bufferPosition >= _bufferSize) [[unlikely]] {
-      fillbuffer();
-   }
 }
 
 Token Lexer::lexString() {

@@ -10,6 +10,9 @@ class Lexer {
    Token next();
    Token peek();
 
+   enum class NumberState { Negative, Zero, Integer, Dot, Fraction, ExpStart, ExpSign, Exp, Done };
+   enum class CharClass { Unknown, Digit, Quote, Literal, Separator, Minus };
+
    struct Iterator {
       using iterator_category = std::forward_iterator_tag;
       using difference_type   = std::ptrdiff_t;
@@ -65,7 +68,6 @@ class Lexer {
          fillbuffer();
       }
    }
-   void appendDigits(std::string &result);
 
    [[nodiscard]] bool isWhitespace() const;
    [[nodiscard]] bool isSeparator() const;
@@ -79,7 +81,7 @@ class Lexer {
    [[nodiscard]] bool isHexDecimal() const;
 
    Token lexSeparator();
-   Token lexNumber();
+   Token lexNumber(NumberState state);
    Token lexString();
    Token lexLiteral();
 
