@@ -2,7 +2,6 @@
 
 #include "concepts.h"
 #include <charconv>
-#include <initializer_list>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -70,13 +69,13 @@ class JsonNumber {
 };
 
 // json value needs to store JsonObject and JsonArray in shared_ptr to know the
-// size of it at compile time.
+// size of it at compile tie.
 class JsonValue {
  public:
    using JsonValueVariantType = std::variant<
        std::monostate,
-       std::shared_ptr<JsonArray>,
-       std::shared_ptr<JsonObject>,
+       std::unique_ptr<JsonArray>,
+       std::unique_ptr<JsonObject>,
        JsonNull,
        JsonString,
        JsonBool,
@@ -85,9 +84,9 @@ class JsonValue {
    JsonValue() noexcept = default;
 
    // copy constructors.
-   JsonValue(const JsonValue &) noexcept       = default;
+   JsonValue(const JsonValue &) noexcept       = delete;
    JsonValue(JsonValue &&) noexcept            = default;
-   JsonValue &operator=(const JsonValue &)     = default;
+   JsonValue &operator=(const JsonValue &)     = delete;
    JsonValue &operator=(JsonValue &&) noexcept = default;
 
    // For most objects, we can create value with a simple constructor.
@@ -112,22 +111,9 @@ class JsonValue {
       }
    }
 
-   // since we have to store arrays and objects in shared pointers
-   // we have special constructors for them so the user does not need to care
-   // about that.
-   JsonValue(const JsonArray &array)
-       : _value(std::make_shared<JsonArray>(array)), _type(ValueType::ARRAY) {}
-   JsonValue(JsonArray &array)
-       : _value(std::make_shared<JsonArray>(std::move(array))), _type(ValueType::ARRAY) {}
-   JsonValue(JsonArray &&array)
-       : _value(std::make_shared<JsonArray>(std::move(array))), _type(ValueType::ARRAY) {}
-
-   JsonValue(const JsonObject &object)
-       : _value(std::make_shared<JsonObject>(object)), _type(ValueType::OBJECT) {}
-   JsonValue(JsonObject &object)
-       : _value(std::make_shared<JsonObject>(std::move(object))), _type(ValueType::OBJECT) {}
-   JsonValue(JsonObject &&object)
-       : _value(std::make_shared<JsonObject>(std::move(object))), _type(ValueType::OBJECT) {}
+   // we only want to support move constructors for objects and arrays.
+   JsonValue(JsonArray &&array);
+   JsonValue(JsonObject &&object);
 
    ValueType getType() const {
       return _type;
@@ -145,13 +131,13 @@ class JsonValue {
 
    // extracts the pointers to ensure the user does not have to care about it.
    // for simple values we just return the contained type.
-   template <libjson::concepts::NonNumeric T> T get() const {
+   template <libjson::concepts::NonNumeric T> const T &get() const {
       if constexpr (std::is_same_v<T, JsonArray>) {
-         if (auto p = std::get_if<std::shared_ptr<JsonArray>>(&_value)) {
+         if (auto p = std::get_if<std::unique_ptr<JsonArray>>(&_value)) {
             return **p;
          }
       } else if constexpr (std::is_same_v<T, JsonObject>) {
-         if (auto p = std::get_if<std::shared_ptr<JsonObject>>(&_value)) {
+         if (auto p = std::get_if<std::unique_ptr<JsonObject>>(&_value)) {
             return **p;
          }
       } else {
@@ -164,11 +150,11 @@ class JsonValue {
 
    template <libjson::concepts::NonNumeric T> T &get() {
       if constexpr (std::is_same_v<T, JsonArray>) {
-         if (auto p = std::get_if<std::shared_ptr<JsonArray>>(&_value)) {
+         if (auto p = std::get_if<std::unique_ptr<JsonArray>>(&_value)) {
             return **p;
          }
       } else if constexpr (std::is_same_v<T, JsonObject>) {
-         if (auto p = std::get_if<std::shared_ptr<JsonObject>>(&_value)) {
+         if (auto p = std::get_if<std::unique_ptr<JsonObject>>(&_value)) {
             return **p;
          }
       } else {
@@ -197,32 +183,26 @@ using JsonArrayData = std::vector<JsonValue>;
 class JsonArray {
  public:
    JsonArray() = default;
-   JsonArray(const JsonArrayData &data) : _data(data) {};
+   JsonArray(JsonArrayData &&data);
 
-   auto begin() {
+   auto begin() const {
       return _data.begin();
    }
-   auto end() {
+   auto end() const {
       return _data.end();
    }
-   const auto cbegin() const {
-      return _data.cbegin();
-   }
-   const auto cend() const {
-      return _data.cend();
-   }
-   size_t size() {
+   const size_t size() const {
       return _data.size();
    }
-   JsonValue operator[](size_t offset) const {
-      return _data[offset];
+   const JsonValue &operator[](size_t offset) const {
+      return _data.at(offset);
    }
 
    template <libjson::concepts::Numeric T> T get(size_t index) const {
       return _data.at(index).get<T>();
    }
 
-   template <libjson::concepts::NonNumeric T> T get(size_t index) const {
+   template <libjson::concepts::NonNumeric T> const T &get(size_t index) const {
       return _data.at(index).get<T>();
    }
 
@@ -241,34 +221,30 @@ using JsonObjectData = std::unordered_map<std::string, JsonValue>;
 class JsonObject {
  public:
    JsonObject() = default;
-   JsonObject(const JsonObjectData &data) : _data(data) {};
-   JsonObject(std::initializer_list<std::pair<std::string, JsonValue>> list)
-       : _data(list.begin(), list.end()) {}
+   // JsonObject(const JsonObjectData &data) : _data(data) {};
+   JsonObject(JsonObjectData &&data) : _data(std::move(data)) {};
+   JsonObject(JsonObject &&other) noexcept : _data(std::move(other._data)) {}
+   // JsonObject(std::initializer_list<std::pair<std::string, JsonValue>> list)
+   //     : _data(list.begin(), list.end()) {}
 
-   auto begin() {
+   auto begin() const {
       return _data.begin();
    }
-   auto end() {
+   auto end() const {
       return _data.end();
    }
-   const auto cbegin() const {
-      return _data.cbegin();
-   }
-   const auto cend() const {
-      return _data.cend();
-   }
-   size_t size() {
+   const size_t size() const {
       return _data.size();
    }
-   JsonValue operator[](const std::string &key) {
-      return _data[key];
+   const JsonValue &operator[](const std::string &key) {
+      return _data.at(key);
    }
 
    template <libjson::concepts::Numeric T> T get(const std::string &key) const {
       return _data.at(key).get<T>();
    }
 
-   template <libjson::concepts::NonNumeric T> const T get(const std::string &key) const {
+   template <libjson::concepts::NonNumeric T> const T &get(const std::string &key) const {
       if constexpr (std::is_same_v<T, JsonValue>) {
          return _data.at(key);
       } else {
@@ -276,14 +252,13 @@ class JsonObject {
       }
    }
 
-   template <libjson::concepts::NonNumeric T> const T &get(const std::string &key) {
+   template <libjson::concepts::NonNumeric T> T &get(const std::string &key) {
       if constexpr (std::is_same_v<T, JsonValue>) {
          return _data.at(key);
       } else {
          return _data.at(key).get<T>();
       }
    }
-
    bool has(const std::string &key) const {
       return _data.contains(key);
    }

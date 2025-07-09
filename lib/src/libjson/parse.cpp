@@ -14,13 +14,13 @@ JsonValue parse(std::istream &stream) {
 }
 
 JsonObject parseObject(Lexer &lexer) {
-   JsonObjectData data;
-   data.reserve(16);
    if (lexer.peek() == Token_CurlyBraceClose) {
       lexer.next();
-      return {data};
+      return JsonObject();
    }
 
+   JsonObjectData data;
+   data.reserve(16);
    while (true) {
       Token tKey = lexer.next();
       expect_token(tKey, Token_String);
@@ -40,33 +40,33 @@ JsonObject parseObject(Lexer &lexer) {
       }
       expect_token(tEnd, Token_Comma);
    }
-   return {data};
+   return JsonObject{std::move(data)};
 }
 
 JsonArray parseArray(Lexer &lexer) {
-   JsonArrayData data;
-   data.reserve(16);
    if (lexer.peek() == Token_SquareBracketClose) {
       lexer.next();
-      return {data};
+      return JsonArray();
    }
 
+   JsonArrayData data;
+   data.reserve(16);
    while (true) {
       data.emplace_back(parseValue(lexer));
 
       Token tEnd = lexer.next();
       if (tEnd == Token_SquareBracketClose) {
-         return {data};
+         return {std::move(data)};
       }
 
       if (tEnd == Token_Comma && lexer.peek() == Token_CurlyBraceClose) {
          // support trailing comma
          lexer.next();
-         return {data};
+         return {std::move(data)};
       }
       expect_token(tEnd, Token_Comma);
    }
-   return {data};
+   return {std::move(data)};
 }
 
 JsonValue parseNumber(const Token &token) {

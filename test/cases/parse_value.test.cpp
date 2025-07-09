@@ -53,7 +53,7 @@ TEST(Parse, object_empty_object) {
    libjson::JsonValue value = libjson::parse(input);
    ASSERT_EQ(value.getType(), libjson::ValueType::OBJECT);
 
-   libjson::JsonObject object = value.get<libjson::JsonObject>();
+   libjson::JsonObject &object = value.get<libjson::JsonObject>();
    ASSERT_EQ(object.size(), 0);
 }
 
@@ -62,6 +62,6 @@ TEST(parse, array_empty_array) {
    libjson::JsonValue value = libjson::parse(input);
    ASSERT_EQ(value.getType(), libjson::ValueType::ARRAY);
 
-   libjson::JsonArray array = value.get<libjson::JsonArray>();
+   libjson::JsonArray &array = value.get<libjson::JsonArray>();
    ASSERT_EQ(array.size(), 0);
 }
