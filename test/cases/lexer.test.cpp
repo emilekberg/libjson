@@ -1,4 +1,4 @@
-#include "libjson/token_types.h"
+#include "libjson/token-types.h"
 #include <gtest/gtest.h>
 #include <libjson/lexer.h>
 

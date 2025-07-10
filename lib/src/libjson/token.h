@@ -1,5 +1,5 @@
 #pragma once
-#include "token_types.h"
+#include "token-types.h"
 #include <string>
 
 namespace libjson {

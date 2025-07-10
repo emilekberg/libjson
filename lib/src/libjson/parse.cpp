@@ -1,8 +1,8 @@
 #include "parse.h"
 #include "exceptions.h"
 #include "json-types.h"
+#include "token-types.h"
 #include "token.h"
-#include "token_types.h"
 namespace libjson {
 
 JsonValue parse(std::istream &stream) {
@@ -16,7 +16,7 @@ JsonValue parse(std::istream &stream) {
 JsonObject parseObject(Lexer &lexer) {
    if (lexer.peek() == Token_CurlyBraceClose) {
       lexer.next();
-      return JsonObject();
+      return JsonObject{};
    }
 
    JsonObjectData data;
@@ -31,9 +31,7 @@ JsonObject parseObject(Lexer &lexer) {
       Token tEnd = lexer.next();
       if (tEnd == Token_CurlyBraceClose) {
          break;
-      }
-
-      if (tEnd == Token_Comma && lexer.peek() == Token_CurlyBraceClose) {
+      } else if (tEnd == Token_Comma && lexer.peek() == Token_CurlyBraceClose) {
          // discard trailing comma
          lexer.next();
          break;
@@ -46,7 +44,7 @@ JsonObject parseObject(Lexer &lexer) {
 JsonArray parseArray(Lexer &lexer) {
    if (lexer.peek() == Token_SquareBracketClose) {
       lexer.next();
-      return JsonArray();
+      return JsonArray{};
    }
 
    JsonArrayData data;
@@ -56,17 +54,17 @@ JsonArray parseArray(Lexer &lexer) {
 
       Token tEnd = lexer.next();
       if (tEnd == Token_SquareBracketClose) {
-         return {std::move(data)};
-      }
-
-      if (tEnd == Token_Comma && lexer.peek() == Token_CurlyBraceClose) {
-         // support trailing comma
+         break;
+      } else if (tEnd == Token_Comma && lexer.peek() == Token_CurlyBraceClose) {
+         // skip trailing comma
+         // TODO: check this with mode flag.
+         // (flags & OPTS_TRAILING_COMMA) != 0
          lexer.next();
-         return {std::move(data)};
+         break;
       }
       expect_token(tEnd, Token_Comma);
    }
-   return {std::move(data)};
+   return JsonArray{std::move(data)};
 }
 
 JsonValue parseNumber(const Token &token) {

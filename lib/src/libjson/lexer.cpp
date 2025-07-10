@@ -1,6 +1,6 @@
 #include "lexer.h"
 #include "libjson/exceptions.h"
-#include "libjson/token_types.h"
+#include "libjson/token-types.h"
 #include <iostream>
 #include <string>
 #include <string_view>
@@ -139,7 +139,7 @@ Token Lexer::lexNumber(NumberState state) {
          }
          if (current() == '.') {
             state = NumberState::Dot;
-         } else if (current() == 'e' || current() == 'E') {
+         } else if (isNumberExponentComponent()) {
             state = NumberState::ExpStart;
          } else {
             state = NumberState::Done;
@@ -160,7 +160,7 @@ Token Lexer::lexNumber(NumberState state) {
          while (isDigit()) {
             appendSpan(result, [](char c) { return c >= '0' && c <= '9'; });
          }
-         if (current() == 'e' || current() == 'E') {
+         if (isNumberExponentComponent()) {
             state = NumberState::ExpStart;
          } else if (current() == '.') {
             throw unexpected_token("Lexer: Number cannot have multiple dots");

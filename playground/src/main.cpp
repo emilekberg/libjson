@@ -1,7 +1,6 @@
-#include "libjson/json-types.h"
 #include "libjson/lexer.h"
+#include "libjson/token-types.h"
 #include "libjson/token.h"
-#include "libjson/token_types.h"
 #include <cassert>
 #include <fstream>
 #include <iostream>

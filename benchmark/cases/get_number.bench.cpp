@@ -29,7 +29,9 @@ void RegisterJsonGetObjectBenchmarks() {
          uint64_t sum = 0;
          for (const auto &o : array) {
             auto &obj = o.get<libjson::JsonObject>();
-            benchmark::DoNotOptimize(obj);
+            bool  b   = obj.has("key");
+
+            benchmark::DoNotOptimize(b);
          }
       }
    });
